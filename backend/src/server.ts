@@ -1,3 +1,4 @@
+import subscriptionRoutes from './routes/subscriptions';
 import express, { Express, Request, Response } from 'express';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
@@ -63,6 +64,7 @@ app.get('/health', (req: Request, res: Response) => {
 
 // API Routes
 app.use('/api/orders', ordersRouter);
+app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/delivery', deliveryRouter);
 
 // 404 Handler
