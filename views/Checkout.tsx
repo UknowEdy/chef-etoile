@@ -54,7 +54,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ selectedPlan, mealPreference
         const message = `Bonjour Chef★ ! Je souhaite m'abonner.%0A%0A*Commande :* ${planDetails?.title}%0A*Préférence :* ${preferenceLabel}%0A*Prix :* ${planDetails?.price}F%0A%0A*Mes infos :*%0A👤 ${formData.fullName}%0A📞 ${formData.phone}%0A📍 ${formData.address}%0A${formData.allergies ? `⚠️ Allergies : ${formData.allergiesDetail}` : ''}`;
         
         // Open WhatsApp (Simulated Payment Gateway)
-        window.open(`https://wa.me/22890000000?text=${message}`, '_blank');
+        window.open(`https://wa.me/22891209085?text=${message}`, '_blank');
         
         onSuccess();
     }, 1500);

@@ -255,7 +255,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ orderId, onBack }) => {
             Contactez notre support pour toute question
           </p>
           <a
-            href="https://wa.me/22890000000"
+            href="https://wa.me/22891209085"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block px-6 py-2 bg-chef-gold text-chef-black rounded-lg font-medium hover:bg-amber-400 transition-colors"
