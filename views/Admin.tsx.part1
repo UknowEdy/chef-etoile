@@ -1,0 +1,12 @@
+import React, { useState, useEffect } from 'react';
+import { Package, MapPin, Users, Clock, CheckCircle, XCircle, Navigation } from 'lucide-react';
+import { Order, DeliveryRoute } from '../types';
+import { orderAPI, deliveryAPI } from '../utils/api';
+const Admin = () => {
+const [orders, setOrders] = useState<Order[]>([]);
+const [route, setRoute] = useState<DeliveryRoute | null>(null);
+const [activeTab, setActiveTab] = useState<'dashboard' | 'orders' | 'route'>('dashboard');
+const [loading, setLoading] = useState(true);
+useEffect(() => { loadData(); const interval = setInterval(loadData, 30000); return () => clearInterval(interval); }, []);
+const loadData = async () => {
+try {

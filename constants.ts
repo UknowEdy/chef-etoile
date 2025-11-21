@@ -26,7 +26,7 @@ export const MOCK_ORDERS: Order[] = [
   {
     id: "CMD-001",
     customerName: "Koffi Mensah",
-    phone: "+228 90 12 34 56",
+    phone: "+228 91 20 90 85",
     address: "Lomé, Quartier Adidogomé, près de la pharmacie",
     plan: PlanType.COMPLETE,
     mealPreference: MealTime.BOTH,
@@ -38,7 +38,7 @@ export const MOCK_ORDERS: Order[] = [
   {
     id: "CMD-002",
     customerName: "Akoua Bossou",
-    phone: "+228 91 98 76 54",
+    phone: "+228 91 20 90 85",
     address: "Lomé, Tokoin Trésor",
     plan: PlanType.SIMPLE,
     mealPreference: MealTime.LUNCH,
@@ -50,7 +50,7 @@ export const MOCK_ORDERS: Order[] = [
   {
     id: "CMD-003",
     customerName: "Jean-Paul Agbo",
-    phone: "+228 92 22 33 44",
+    phone: "+228 91 20 90 85",
     address: "Lomé, Hedzranawoé",
     plan: PlanType.SIMPLE,
     mealPreference: MealTime.DINNER,

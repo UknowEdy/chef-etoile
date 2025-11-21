@@ -32,7 +32,7 @@ const UserSchema = new Schema<IUser>(
           // Format Togo: +228 XX XX XX XX
           return /^\+228\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{2}$/.test(v);
         },
-        message: 'Format de téléphone invalide (ex: +228 90 00 00 00)'
+        message: 'Format de téléphone invalide (ex: +228 91 20 90 85)'
       }
     },
     email: {

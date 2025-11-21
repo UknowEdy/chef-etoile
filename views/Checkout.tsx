@@ -126,7 +126,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ selectedPlan, mealPreference
                                 required
                                 value={formData.phone}
                                 onChange={handleInputChange}
-                                placeholder="+228 90 00 00 00"
+                                placeholder="+228 91 20 90 85"
                                 className="w-full p-3 pl-10 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-chef-orange/50 transition-all"
                             />
                         </div>
