@@ -25,7 +25,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/chef-e
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'http://localhost:5173', 'https://chef-etoile.vercel.app'],
   credentials: true
 }));
 app.use(express.json());
