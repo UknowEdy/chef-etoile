@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Check, Star, ChevronDown, ArrowRight } from 'lucide-react';
+import WeeklyMenu from '../components/WeeklyMenu';
 import { PLANS } from '../constants';
 import { PlanType, MealTime } from '../types';
 
