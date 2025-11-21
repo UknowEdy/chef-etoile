@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#ea580c"/>
+
+  <!-- Fork and Knife Icon -->
+  <g fill="white" transform="translate(128, 100)">
+    <!-- Fork -->
+    <path d="M64 0 L64 120 L75 120 L75 300 L53 300 L53 120 L64 120 L64 0 M43 0 L43 80 L53 120 L53 0 Z M75 0 L75 80 L64 120 L64 0 Z M85 0 L85 80 L75 120 L75 0 Z" stroke="white" stroke-width="4"/>
+
+    <!-- Knife -->
+    <path d="M192 0 L203 0 L203 133 C203 160 213 173 213 213 L213 300 L181 300 L181 213 C181 173 192 160 192 133 Z" stroke="white" stroke-width="4"/>
+  </g>
+
+  <!-- Star decoration -->
+  <text x="256" y="390" font-size="80" text-anchor="middle" fill="#fbbf24">★</text>
+</svg>

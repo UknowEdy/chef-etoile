@@ -4,6 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chef★ - Déléguez la cuisine</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#ea580c" />
+    <meta name="description" content="Chef★ - Service de livraison de repas premium à Lomé, Togo. Abonnement hebdomadaire avec livraison GPS optimisée." />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Chef★" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-192.svg" />
+    <link rel="icon" type="image/svg+xml" href="/icon-192.svg" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script>
@@ -40,5 +50,16 @@
   <body class="bg-chef-cream text-chef-black font-sans antialiased">
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
+          .catch(err => console.log('[PWA] Service Worker error:', err));
+      });
+    }
+  </script>
 </body>
 </html>

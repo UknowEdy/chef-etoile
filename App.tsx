@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
+import { InstallPWA } from './components/InstallPWA';
 import { Landing } from './views/Landing';
 import { Checkout } from './views/Checkout';
 import { Dashboard } from './views/Dashboard';
@@ -112,6 +113,9 @@ export default function App() {
           </div>
         </footer>
       )}
+
+      {/* PWA Install Banner */}
+      <InstallPWA />
     </div>
   );
 }
