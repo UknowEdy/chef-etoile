@@ -133,7 +133,7 @@ export const Admin: React.FC<AdminProps> = ({ onBack }) => {
               <div>
                 <p className="text-stone-500 text-xs uppercase font-bold">Revenu Total</p>
                 <p className="text-2xl font-bold text-chef-green">
-                  {stats.totalRevenue.toLocaleString()} F
+                  {stats.totalRevenue?.toLocaleString() || "0"} F
                 </p>
               </div>
               <div className="p-3 bg-green-50 text-green-600 rounded-lg">
@@ -341,7 +341,7 @@ const AllOrdersView: React.FC<AllOrdersViewProps> = ({ orders, getStatusColor, g
                   </span>
                 </td>
                 <td className="p-4 text-right font-bold text-chef-orange">
-                  {order.totalPrice.toLocaleString()} F
+                  {order.amount.toLocaleString()} F
                 </td>
               </tr>
             ))}
