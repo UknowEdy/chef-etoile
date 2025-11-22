@@ -11,12 +11,6 @@ export interface IUser extends Document {
     startDate?: Date;
     endDate?: Date;
   };
-  subscription?: {
-    isActive: boolean;
-    type: "COMPLET" | "DEJEUNER" | "DINER";
-    startDate?: Date;
-    endDate?: Date;
-  };
   defaultGPS?: {
     lat: number;
     lng: number;

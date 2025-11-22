@@ -1,4 +1,4 @@
-import subscriptionRoutes from './routes/subscriptions';
+import subscriptionRoutes from './routes/subscriptions.js';
 import express, { Express, Request, Response } from 'express';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
