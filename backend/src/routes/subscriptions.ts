@@ -1,6 +1,7 @@
+import fs from 'fs';
 import express from 'express';
-import { User } from '../models/User.js';
-import WeeklyMenu from '../models/WeeklyMenu.js';
+import User from '../models/User';
+import WeeklyMenu from '../models/WeeklyMenu';
 import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();

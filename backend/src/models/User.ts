@@ -80,7 +80,6 @@ const UserSchema = new Schema<IUser>(
 );
 
 // Index pour recherche rapide
-UserSchema.index({ phone: 1 });
 UserSchema.index({ createdAt: -1 });
 
 export const User = mongoose.model<IUser>('User', UserSchema);

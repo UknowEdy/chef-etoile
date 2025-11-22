@@ -9,7 +9,7 @@ interface AdminProps {
 }
 
 export const Admin: React.FC<AdminProps> = ({ onBack }) => {
-  const [activeTab, setActiveTab] = useState<'delivery' | 'all'>('delivery');
+  const [activeTab, setActiveTab] = useState<'delivery' | 'all' | 'abonnes'>('delivery');
   const [deliveryOrders, setDeliveryOrders] = useState<Order[]>([]);
   const [allOrders, setAllOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<any>(null);
