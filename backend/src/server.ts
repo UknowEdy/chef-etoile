@@ -6,6 +6,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import ordersRouter from './routes/orders.js';
 import deliveryRouter from './routes/delivery.js';
+import authRouter from './routes/auth.js';
+import adminRouter from './routes/admin.js';
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -45,6 +47,8 @@ app.get('/', (req: Request, res: Response) => {
     message: 'Chef★ API - Système de livraison intelligent',
     version: '1.0.0',
     endpoints: {
+      auth: '/api/auth',
+      admin: '/api/admin',
       orders: '/api/orders',
       delivery: '/api/delivery',
       health: '/health'
@@ -62,6 +66,8 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // API Routes
+app.use('/api/auth', authRouter);
+app.use('/api/admin', adminRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/delivery', deliveryRouter);
 
