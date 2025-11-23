@@ -1,6 +1,5 @@
-import fs from 'fs';
 import express from 'express';
-import User from '../models/User';
+import { User } from '../models/User';
 import WeeklyMenu from '../models/WeeklyMenu';
 import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
 
@@ -33,7 +32,7 @@ router.post('/weekly-menu', authMiddleware, adminMiddleware, async (req, res) =>
 router.get('/clients', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const clients = await User.find({ role: 'CLIENT' })
-      .select('name email phone address subscription')
+      .select('fullName email phone address subscription')
       .sort({ createdAt: -1 });
     res.json({ success: true, data: clients });
   } catch (error: any) {

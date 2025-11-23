@@ -5,17 +5,18 @@ export interface IUser extends Document {
   phone: string;
   email?: string;
   address: string;
+  role: 'CLIENT' | 'ADMIN';
+  defaultGPS?: {
+    lat: number;
+    lng: number;
+  };
+  allergies?: string;
   subscription?: {
     isActive: boolean;
     type: "COMPLET" | "DEJEUNER" | "DINER";
     startDate?: Date;
     endDate?: Date;
   };
-  defaultGPS?: {
-    lat: number;
-    lng: number;
-  };
-  allergies?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -52,6 +53,11 @@ const UserSchema = new Schema<IUser>(
         message: 'Format d\'email invalide'
       }
     },
+    role: {
+      type: String,
+      enum: ['CLIENT', 'ADMIN'],
+      default: 'CLIENT'
+    },
     address: {
       type: String,
       required: [true, 'L\'adresse est requise'],
@@ -72,6 +78,23 @@ const UserSchema = new Schema<IUser>(
     allergies: {
       type: String,
       trim: true
+    },
+    subscription: {
+      isActive: {
+        type: Boolean,
+        default: false
+      },
+      type: {
+        type: String,
+        enum: ['COMPLET', 'DEJEUNER', 'DINER'],
+        default: 'COMPLET'
+      },
+      startDate: {
+        type: Date
+      },
+      endDate: {
+        type: Date
+      }
     }
   },
   {
