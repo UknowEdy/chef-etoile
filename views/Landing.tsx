@@ -26,10 +26,10 @@ export const Landing: React.FC<LandingProps> = ({ onSelectPlan }) => {
       <div className="relative h-[75vh] w-full overflow-hidden bg-chef-black text-white flex items-end">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
-            {/* Image style 'Festin' vue de dessus avec des tons chauds */}
-            <img 
-                src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop" 
-                alt="Festin de plats africains vue de dessus" 
+            {/* Image d'en-tête personnalisée */}
+            <img
+                src="/images/hero-bg.jpeg"
+                alt="Chef Étoile - Repas gastronomiques"
                 className="w-full h-full object-cover opacity-70"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />

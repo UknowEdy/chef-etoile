@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
+import { InstallPWA } from './components/InstallPWA';
 import { Landing } from './views/Landing';
 import { Checkout } from './views/Checkout';
 import { Dashboard } from './views/Dashboard';
 import { Admin } from './views/Admin';
-import { ViewState, PlanType, MealTime } from './types';
+import Login from './views/Login';
+import AdminLogin from './views/AdminLogin';
+import AdminDashboard from './views/AdminDashboard';
+import ClientDashboard from './views/ClientDashboard';
+import { ViewState, PlanType, MealTime, User } from './types';
 import { CheckCircle } from 'lucide-react';
 
 export default function App() {
@@ -12,6 +17,33 @@ export default function App() {
   const [selectedPlan, setSelectedPlan] = useState<PlanType>(PlanType.COMPLETE);
   const [mealPreference, setMealPreference] = useState<MealTime>(MealTime.BOTH);
   const [currentOrderId, setCurrentOrderId] = useState<string>('');
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+
+  // Vérifier le token au chargement
+  useEffect(() => {
+    const savedToken = localStorage.getItem('token');
+    const savedUser = localStorage.getItem('user');
+
+    if (savedToken && savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setToken(savedToken);
+        setUser(parsedUser);
+
+        // Rediriger vers le bon dashboard selon le rôle
+        if (parsedUser.role === 'admin') {
+          setCurrentView('ADMIN_DASHBOARD');
+        } else if (parsedUser.role === 'client') {
+          setCurrentView('CLIENT_DASHBOARD');
+        }
+      } catch (e) {
+        // Token invalide, nettoyer
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    }
+  }, []);
 
   const navigateTo = (view: ViewState) => {
     setCurrentView(view);
@@ -29,6 +61,26 @@ export default function App() {
       setCurrentOrderId(orderId);
     }
     navigateTo('SUCCESS');
+  };
+
+  const handleLoginSuccess = (loggedInUser: User, userToken: string) => {
+    setUser(loggedInUser);
+    setToken(userToken);
+
+    // Rediriger selon le rôle
+    if (loggedInUser.role === 'admin') {
+      navigateTo('ADMIN_DASHBOARD');
+    } else {
+      navigateTo('CLIENT_DASHBOARD');
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    setToken(null);
+    navigateTo('HOME');
   };
 
   // Success View Component (Internal)
@@ -51,7 +103,6 @@ export default function App() {
           Retour à l'accueil
         </button>
 
-        {/* Bouton pour aller au Dashboard - Pour dev/test */}
         {currentOrderId && (
           <button
             onClick={() => navigateTo('DASHBOARD')}
@@ -68,10 +119,18 @@ export default function App() {
     </div>
   );
 
+  // Déterminer si on doit afficher le header
+  const showHeader = !['ADMIN', 'SUCCESS', 'DASHBOARD', 'LOGIN', 'ADMIN_LOGIN', 'ADMIN_DASHBOARD', 'CLIENT_DASHBOARD'].includes(currentView);
+
   return (
     <div className="min-h-screen flex flex-col">
-      {currentView !== 'ADMIN' && currentView !== 'SUCCESS' && currentView !== 'DASHBOARD' && (
-        <Header onNavigate={navigateTo} />
+      {showHeader && (
+        <Header
+          onNavigate={navigateTo}
+          user={user}
+          onLogin={() => navigateTo('LOGIN')}
+          onLogout={handleLogout}
+        />
       )}
 
       <main className="flex-grow">
@@ -93,6 +152,35 @@ export default function App() {
         )}
 
         {currentView === 'ADMIN' && <Admin onBack={() => navigateTo('HOME')} />}
+
+        {currentView === 'LOGIN' && (
+          <Login
+            onLoginSuccess={handleLoginSuccess}
+            onSwitchToAdmin={() => navigateTo('ADMIN_LOGIN')}
+          />
+        )}
+
+        {currentView === 'ADMIN_LOGIN' && (
+          <AdminLogin
+            onLoginSuccess={handleLoginSuccess}
+            onSwitchToClient={() => navigateTo('LOGIN')}
+          />
+        )}
+
+        {currentView === 'ADMIN_DASHBOARD' && user && (
+          <AdminDashboard
+            user={user}
+            onLogout={handleLogout}
+          />
+        )}
+
+        {currentView === 'CLIENT_DASHBOARD' && user && (
+          <ClientDashboard
+            user={user}
+            onLogout={handleLogout}
+            onBack={() => navigateTo('HOME')}
+          />
+        )}
       </main>
 
       {/* Footer (only on Landing) */}
@@ -112,6 +200,9 @@ export default function App() {
           </div>
         </footer>
       )}
+
+      {/* PWA Install Banner */}
+      <InstallPWA />
     </div>
   );
 }

@@ -58,7 +58,23 @@ export interface Order {
   updatedAt?: Date | string;
 }
 
-export type ViewState = 'HOME' | 'CHECKOUT' | 'SUCCESS' | 'ADMIN' | 'DASHBOARD';
+export type ViewState = 'HOME' | 'CHECKOUT' | 'SUCCESS' | 'ADMIN' | 'DASHBOARD' | 'LOGIN' | 'ADMIN_LOGIN' | 'ADMIN_DASHBOARD' | 'CLIENT_DASHBOARD';
+
+export interface User {
+  _id: string;
+  fullName: string;
+  phone: string;
+  email?: string;
+  role: 'client' | 'admin' | 'livreur';
+  address: string;
+  location?: {
+    lat: number;
+    lng: number;
+    updatedAt: string;
+  };
+  readyToReceive: boolean;
+  readyAt?: string;
+}
 
 export interface DeliveryRoute {
   success: boolean;
