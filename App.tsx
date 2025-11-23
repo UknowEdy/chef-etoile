@@ -9,6 +9,9 @@ import Login from './views/Login';
 import AdminLogin from './views/AdminLogin';
 import AdminDashboard from './views/AdminDashboard';
 import ClientDashboard from './views/ClientDashboard';
+import Menu from './views/Menu';
+import AdminMenu from './views/AdminMenu';
+import LivreurDashboard from './views/LivreurDashboard';
 import { ViewState, PlanType, MealTime, User } from './types';
 import { CheckCircle } from 'lucide-react';
 
@@ -34,6 +37,8 @@ export default function App() {
         // Rediriger vers le bon dashboard selon le rôle
         if (parsedUser.role === 'admin') {
           setCurrentView('ADMIN_DASHBOARD');
+        } else if (parsedUser.role === 'livreur') {
+          setCurrentView('LIVREUR_DASHBOARD');
         } else if (parsedUser.role === 'client') {
           setCurrentView('CLIENT_DASHBOARD');
         }
@@ -70,6 +75,8 @@ export default function App() {
     // Rediriger selon le rôle
     if (loggedInUser.role === 'admin') {
       navigateTo('ADMIN_DASHBOARD');
+    } else if (loggedInUser.role === 'livreur') {
+      navigateTo('LIVREUR_DASHBOARD');
     } else {
       navigateTo('CLIENT_DASHBOARD');
     }
@@ -120,7 +127,7 @@ export default function App() {
   );
 
   // Déterminer si on doit afficher le header
-  const showHeader = !['ADMIN', 'SUCCESS', 'DASHBOARD', 'LOGIN', 'ADMIN_LOGIN', 'ADMIN_DASHBOARD', 'CLIENT_DASHBOARD'].includes(currentView);
+  const showHeader = !['ADMIN', 'SUCCESS', 'DASHBOARD', 'LOGIN', 'ADMIN_LOGIN', 'ADMIN_DASHBOARD', 'CLIENT_DASHBOARD', 'MENU', 'ADMIN_MENU', 'LIVREUR_DASHBOARD'].includes(currentView);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -176,6 +183,27 @@ export default function App() {
 
         {currentView === 'CLIENT_DASHBOARD' && user && (
           <ClientDashboard
+            user={user}
+            onLogout={handleLogout}
+            onBack={() => navigateTo('HOME')}
+          />
+        )}
+
+        {currentView === 'MENU' && (
+          <Menu
+            user={user}
+            onBack={() => navigateTo('HOME')}
+          />
+        )}
+
+        {currentView === 'ADMIN_MENU' && user?.role === 'admin' && (
+          <AdminMenu
+            onBack={() => navigateTo('ADMIN_DASHBOARD')}
+          />
+        )}
+
+        {currentView === 'LIVREUR_DASHBOARD' && user?.role === 'livreur' && (
+          <LivreurDashboard
             user={user}
             onLogout={handleLogout}
             onBack={() => navigateTo('HOME')}

@@ -206,7 +206,7 @@ export interface Order {
   updatedAt?: Date | string;
 }
 
-export type ViewState = 'HOME' | 'CHECKOUT' | 'SUCCESS' | 'ADMIN' | 'DASHBOARD' | 'LOGIN' | 'ADMIN_LOGIN' | 'ADMIN_DASHBOARD' | 'CLIENT_DASHBOARD' | 'MENU' | 'LIVREUR_DASHBOARD';
+export type ViewState = 'HOME' | 'CHECKOUT' | 'SUCCESS' | 'ADMIN' | 'DASHBOARD' | 'LOGIN' | 'ADMIN_LOGIN' | 'ADMIN_DASHBOARD' | 'CLIENT_DASHBOARD' | 'MENU' | 'ADMIN_MENU' | 'LIVREUR_DASHBOARD';
 
 export interface DeliveryRoute {
   success: boolean;
