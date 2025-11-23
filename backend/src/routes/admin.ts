@@ -6,7 +6,11 @@ import {
   exportRoutes,
   getAdminStats,
   resetAllReadyStatus,
-  getAllUsers
+  getAllUsers,
+  getPendingPayments,
+  verifyPayment,
+  calculateStock,
+  exportDailyDeliveries
 } from '../controllers/adminController.js';
 
 const router = Router();
@@ -37,7 +41,7 @@ router.post('/routes/export', exportRoutes);
 
 /**
  * @route   GET /api/admin/stats
- * @desc    Récupérer les statistiques admin
+ * @desc    Récupérer les statistiques admin complètes
  * @access  Admin
  */
 router.get('/stats', getAdminStats);
@@ -55,5 +59,33 @@ router.post('/reset-ready', resetAllReadyStatus);
  * @access  Admin
  */
 router.get('/users', getAllUsers);
+
+/**
+ * @route   GET /api/admin/payments/pending
+ * @desc    Récupérer les paiements en attente de vérification
+ * @access  Admin
+ */
+router.get('/payments/pending', getPendingPayments);
+
+/**
+ * @route   POST /api/admin/payments/:userId/verify
+ * @desc    Vérifier un paiement et activer l'abonnement
+ * @access  Admin
+ */
+router.post('/payments/:userId/verify', verifyPayment);
+
+/**
+ * @route   POST /api/admin/stock/calculate
+ * @desc    Calculer les stocks nécessaires (160g/personne)
+ * @access  Admin
+ */
+router.post('/stock/calculate', calculateStock);
+
+/**
+ * @route   GET /api/admin/deliveries/export
+ * @desc    Exporter la liste des livraisons du jour
+ * @access  Admin
+ */
+router.get('/deliveries/export', exportDailyDeliveries);
 
 export default router;

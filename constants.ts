@@ -4,19 +4,19 @@ export const PLANS: SubscriptionPlan[] = [
   {
     id: PlanType.COMPLETE,
     title: "Formule Complète",
-    price: 10000,
+    price: 14000,
     description: "L'expérience totale. Déjeuner et Dîner livrés chaque jour.",
     mealCount: 10, // 5 days * 2
-    features: ["Déjeuner + Dîner", "Livraison incluse", "Menu varié"],
+    features: ["Déjeuner + Dîner", "10 repas/semaine", "Livraison incluse", "Menu varié"],
     isRecommended: true
   },
   {
-    id: PlanType.SIMPLE,
-    title: "Formule Simple",
-    price: 5000,
+    id: PlanType.PARTIEL,
+    title: "Formule Partielle",
+    price: 7500,
     description: "Flexibilité totale. Choisissez votre moment.",
     mealCount: 5, // 5 days * 1
-    features: ["Déjeuner OU Dîner", "Livraison incluse", "Menu varié"],
+    features: ["Déjeuner OU Dîner", "5 repas/semaine", "Livraison incluse", "Menu varié"],
     isRecommended: false
   }
 ];

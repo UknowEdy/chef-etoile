@@ -1,7 +1,15 @@
 import { Response } from 'express';
 import { User } from '../models/User.js';
+import { Dish } from '../models/Dish.js';
+import { Delivery } from '../models/Delivery.js';
 import { AuthRequest } from '../middleware/adminAuth.js';
 import { generateDeliveryRoutes, generateDeliveryReport, ClientWithDistance } from '../services/routingService.js';
+
+// Prix des formules
+const PRICES = {
+  COMPLETE: 14000,
+  PARTIEL: 7500
+};
 
 /**
  * Récupérer tous les clients prêts à recevoir
@@ -141,7 +149,7 @@ export const exportRoutes = async (req: AuthRequest, res: Response) => {
 };
 
 /**
- * Récupérer les statistiques admin
+ * Récupérer les statistiques admin complètes
  */
 export const getAdminStats = async (req: AuthRequest, res: Response) => {
   try {
@@ -149,13 +157,34 @@ export const getAdminStats = async (req: AuthRequest, res: Response) => {
       totalClients,
       readyClients,
       totalLivreurs,
-      totalAdmins
+      totalAdmins,
+      activeSubscribers,
+      pendingPayments,
+      topDishes
     ] = await Promise.all([
       User.countDocuments({ role: 'client' }),
       User.countDocuments({ role: 'client', readyToReceive: true }),
       User.countDocuments({ role: 'livreur' }),
-      User.countDocuments({ role: 'admin' })
+      User.countDocuments({ role: 'admin' }),
+      User.countDocuments({ role: 'client', 'subscription.isActive': true }),
+      User.countDocuments({ role: 'client', 'subscription.paymentProof': { $exists: true }, 'subscription.paymentVerified': false }),
+      Dish.find().sort({ likesCount: -1 }).limit(5)
     ]);
+
+    // Calcul revenus semaine
+    const subscribersWithPlan = await User.find({
+      role: 'client',
+      'subscription.isActive': true
+    }).select('subscription.plan');
+
+    let weeklyRevenue = 0;
+    subscribersWithPlan.forEach(user => {
+      if (user.subscription?.plan === 'COMPLETE') {
+        weeklyRevenue += PRICES.COMPLETE;
+      } else if (user.subscription?.plan === 'PARTIEL') {
+        weeklyRevenue += PRICES.PARTIEL;
+      }
+    });
 
     res.json({
       success: true,
@@ -163,7 +192,11 @@ export const getAdminStats = async (req: AuthRequest, res: Response) => {
         totalClients,
         readyClients,
         totalLivreurs,
-        totalAdmins
+        totalAdmins,
+        activeSubscribers,
+        pendingPayments,
+        weeklyRevenue,
+        topDishes
       }
     });
   } catch (error: any) {
@@ -234,6 +267,193 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des utilisateurs',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Récupérer les paiements en attente de vérification
+ */
+export const getPendingPayments = async (req: AuthRequest, res: Response) => {
+  try {
+    const pendingPayments = await User.find({
+      role: 'client',
+      'subscription.paymentProof': { $exists: true, $ne: '' },
+      'subscription.paymentVerified': false
+    }).select('fullName phone email subscription createdAt');
+
+    res.json({
+      success: true,
+      data: pendingPayments
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la récupération des paiements',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Vérifier un paiement et activer l'abonnement
+ */
+export const verifyPayment = async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { approved, plan, mealPreference } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'Utilisateur non trouvé' });
+    }
+
+    if (approved) {
+      // Générer QR code et numéro de confirmation
+      const confirmationNumber = `CE${Date.now().toString(36).toUpperCase()}`;
+      const qrCode = `CHEF-ETOILE:${confirmationNumber}`;
+
+      user.subscription = {
+        isActive: true,
+        plan: plan || user.subscription?.plan || 'COMPLETE',
+        mealPreference: mealPreference || user.subscription?.mealPreference || 'BOTH',
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // +7 jours
+        paymentProof: user.subscription?.paymentProof,
+        paymentVerified: true
+      };
+      user.qrCode = qrCode;
+      user.confirmationNumber = confirmationNumber;
+
+      // Vérifier parrainage
+      if (user.referredBy) {
+        const referrer = await User.findOne({ referralCode: user.referredBy });
+        if (referrer) {
+          referrer.referralCount = (referrer.referralCount || 0) + 1;
+          // 5 filleuls = 1 repas gratuit
+          if (referrer.referralCount % 5 === 0) {
+            referrer.freeMealsEarned = (referrer.freeMealsEarned || 0) + 1;
+          }
+          await referrer.save();
+        }
+      }
+
+      await user.save();
+
+      res.json({
+        success: true,
+        message: 'Abonnement activé avec succès',
+        data: {
+          user: {
+            fullName: user.fullName,
+            confirmationNumber,
+            qrCode,
+            subscription: user.subscription
+          }
+        }
+      });
+    } else {
+      // Paiement refusé
+      user.subscription = {
+        ...user.subscription,
+        paymentVerified: false,
+        isActive: false
+      } as any;
+      await user.save();
+
+      res.json({
+        success: true,
+        message: 'Paiement refusé'
+      });
+    }
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la vérification',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Calcul de stock (160g par personne)
+ */
+export const calculateStock = async (req: AuthRequest, res: Response) => {
+  try {
+    const { clientCount, gramsPerPerson = 160 } = req.body;
+
+    // Si pas de clientCount fourni, compter les abonnés actifs
+    let count = clientCount;
+    if (!count) {
+      count = await User.countDocuments({
+        role: 'client',
+        'subscription.isActive': true
+      });
+    }
+
+    const totalGrams = count * gramsPerPerson;
+    const totalKg = totalGrams / 1000;
+
+    res.json({
+      success: true,
+      data: {
+        clientCount: count,
+        gramsPerPerson,
+        totalGrams,
+        totalKg: Math.ceil(totalKg * 10) / 10 // Arrondi au 100g supérieur
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors du calcul',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Exporter liste livraisons du jour (pour PDF)
+ */
+export const exportDailyDeliveries = async (req: AuthRequest, res: Response) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Clients avec abonnement actif
+    const activeClients = await User.find({
+      role: 'client',
+      'subscription.isActive': true
+    }).select('fullName phone address subscription confirmationNumber').sort({ fullName: 1 });
+
+    let report = `═══════════════════════════════════════════\n`;
+    report += `     CHEF ÉTOILE - LIVRAISONS DU JOUR\n`;
+    report += `     ${today.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n`;
+    report += `═══════════════════════════════════════════\n\n`;
+    report += `Total clients: ${activeClients.length}\n\n`;
+
+    activeClients.forEach((client, index) => {
+      report += `${index + 1}. ${client.fullName}\n`;
+      report += `   📞 ${client.phone}\n`;
+      report += `   📍 ${client.address || 'Adresse non renseignée'}\n`;
+      report += `   📋 ${client.subscription?.plan || 'N/A'} - ${client.subscription?.mealPreference || 'N/A'}\n`;
+      report += `   🔢 ${client.confirmationNumber || 'N/A'}\n`;
+      report += `   ─────────────────────────────────────\n`;
+    });
+
+    report += `\n═══════════════════════════════════════════\n`;
+    report += `Généré le ${new Date().toLocaleString('fr-FR')}\n`;
+
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename=livraisons_${today.toISOString().split('T')[0]}.txt`);
+    res.send(report);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de l\'export',
       error: error.message
     });
   }

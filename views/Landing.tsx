@@ -125,7 +125,7 @@ export const Landing: React.FC<LandingProps> = ({ onSelectPlan }) => {
                         </ul>
 
                         {isComplete ? (
-                            <button 
+                            <button
                                 onClick={() => onSelectPlan(PlanType.COMPLETE, MealTime.BOTH)}
                                 className="w-full py-4 rounded-xl bg-chef-gold text-chef-black font-bold hover:bg-amber-400 transition-colors text-center"
                             >
@@ -134,7 +134,7 @@ export const Landing: React.FC<LandingProps> = ({ onSelectPlan }) => {
                         ) : (
                             <div className="space-y-3">
                                 {!expandedSimple ? (
-                                     <button 
+                                     <button
                                         onClick={handleSimpleClick}
                                         className="w-full py-4 rounded-xl border-2 border-chef-black text-chef-black font-bold hover:bg-stone-50 transition-colors flex items-center justify-center gap-2"
                                     >
@@ -144,20 +144,20 @@ export const Landing: React.FC<LandingProps> = ({ onSelectPlan }) => {
                                     <div className="bg-orange-50 p-4 rounded-xl animate-in fade-in slide-in-from-top-2 duration-200">
                                         <p className="text-sm font-medium mb-3 text-center text-chef-orange">Votre préférence ?</p>
                                         <div className="grid grid-cols-2 gap-2 mb-3">
-                                            <button 
-                                                onClick={() => onSelectPlan(PlanType.SIMPLE, MealTime.LUNCH)}
+                                            <button
+                                                onClick={() => onSelectPlan(PlanType.PARTIEL, MealTime.LUNCH)}
                                                 className="py-2 px-3 bg-white border border-orange-100 rounded-lg text-sm font-medium hover:border-chef-orange hover:text-chef-orange transition-all shadow-sm"
                                             >
                                                 Déjeuner
                                             </button>
-                                            <button 
-                                                onClick={() => onSelectPlan(PlanType.SIMPLE, MealTime.DINNER)}
+                                            <button
+                                                onClick={() => onSelectPlan(PlanType.PARTIEL, MealTime.DINNER)}
                                                 className="py-2 px-3 bg-white border border-orange-100 rounded-lg text-sm font-medium hover:border-chef-orange hover:text-chef-orange transition-all shadow-sm"
                                             >
                                                 Dîner
                                             </button>
                                         </div>
-                                        <button 
+                                        <button
                                             onClick={handleSimpleClick}
                                             className="w-full text-xs text-stone-400 underline hover:text-stone-600"
                                         >

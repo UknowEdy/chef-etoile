@@ -9,6 +9,9 @@ import ordersRouter from './routes/orders.js';
 import deliveryRouter from './routes/delivery.js';
 import authRouter from './routes/auth.js';
 import adminRouter from './routes/admin.js';
+import dishesRouter from './routes/dishes.js';
+import menuRouter from './routes/menu.js';
+import livreurRouter from './routes/livreur.js';
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -72,6 +75,9 @@ app.use('/api/admin', adminRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/delivery', deliveryRouter);
+app.use('/api/dishes', dishesRouter);
+app.use('/api/menu', menuRouter);
+app.use('/api/livreur', livreurRouter);
 
 // 404 Handler
 app.use((req: Request, res: Response) => {
