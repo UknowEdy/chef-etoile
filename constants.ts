@@ -30,7 +30,7 @@ export const MOCK_ORDERS: Order[] = [
     address: "Lomé, Quartier Adidogomé, près de la pharmacie",
     plan: PlanType.COMPLETE,
     mealPreference: MealTime.BOTH,
-    totalPrice: 10000,
+    totalPrice: 14000,
     allergies: false,
     date: "2023-10-25",
     status: 'CONFIRMED'
@@ -40,9 +40,9 @@ export const MOCK_ORDERS: Order[] = [
     customerName: "Akoua Bossou",
     phone: "+228 91 20 90 85",
     address: "Lomé, Tokoin Trésor",
-    plan: PlanType.SIMPLE,
+    plan: PlanType.PARTIEL,
     mealPreference: MealTime.LUNCH,
-    totalPrice: 5000,
+    totalPrice: 7500,
     allergies: true,
     date: "2023-10-26",
     status: 'PENDING'
@@ -52,9 +52,9 @@ export const MOCK_ORDERS: Order[] = [
     customerName: "Jean-Paul Agbo",
     phone: "+228 91 20 90 85",
     address: "Lomé, Hedzranawoé",
-    plan: PlanType.SIMPLE,
+    plan: PlanType.PARTIEL,
     mealPreference: MealTime.DINNER,
-    totalPrice: 5000,
+    totalPrice: 7500,
     allergies: false,
     date: "2023-10-26",
     status: 'DELIVERED'
