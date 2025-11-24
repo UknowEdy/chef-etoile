@@ -1,15 +1,27 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export enum UserType {
+  CLIENT = 'CLIENT',
+  ADMIN = 'ADMIN',
+  DELIVERY = 'DELIVERY'
+}
+
 export interface IUser extends Document {
   fullName: string;
   phone: string;
   email?: string;
+  password: string; // Plain text password
   address: string;
+  userType: UserType;
   defaultGPS?: {
     lat: number;
     lng: number;
   };
   allergies?: string;
+  dietaryPreferences?: string[]; // Vegetarian, no fish, etc.
+  qrCodeId?: string; // Unique QR code identifier
+  referralCode?: string; // Code unique de parrain
+  referredByCode?: string; // Code du parrain qui a invité
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,10 +58,19 @@ const UserSchema = new Schema<IUser>(
         message: 'Format d\'email invalide'
       }
     },
+    password: {
+      type: String,
+      required: [true, 'Le mot de passe est requis']
+    },
     address: {
       type: String,
       required: [true, 'L\'adresse est requise'],
       trim: true
+    },
+    userType: {
+      type: String,
+      enum: Object.values(UserType),
+      default: UserType.CLIENT
     },
     defaultGPS: {
       lat: {
@@ -64,6 +85,24 @@ const UserSchema = new Schema<IUser>(
       }
     },
     allergies: {
+      type: String,
+      trim: true
+    },
+    dietaryPreferences: {
+      type: [String],
+      default: []
+    },
+    qrCodeId: {
+      type: String,
+      unique: true,
+      sparse: true
+    },
+    referralCode: {
+      type: String,
+      unique: true,
+      sparse: true
+    },
+    referredByCode: {
       type: String,
       trim: true
     }
