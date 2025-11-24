@@ -58,7 +58,7 @@ export interface Order {
   updatedAt?: Date | string;
 }
 
-export type ViewState = 'HOME' | 'CHECKOUT' | 'SUCCESS' | 'ADMIN' | 'DASHBOARD';
+export type ViewState = 'HOME' | 'CHECKOUT' | 'SUCCESS' | 'ADMIN' | 'DASHBOARD' | 'LOGIN' | 'ADMIN_LOGIN';
 
 export interface DeliveryRoute {
   success: boolean;

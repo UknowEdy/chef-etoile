@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Check, Star, ChevronDown, ArrowRight } from 'lucide-react';
+import { Check, Star, ChevronDown, ArrowRight, LogIn } from 'lucide-react';
 import { PLANS } from '../constants';
-import { PlanType, MealTime } from '../types';
+import { PlanType, MealTime, ViewState } from '../types';
 
 interface LandingProps {
   onSelectPlan: (plan: PlanType, preference: MealTime) => void;
+  onNavigate?: (view: ViewState) => void;
 }
 
-export const Landing: React.FC<LandingProps> = ({ onSelectPlan }) => {
+export const Landing: React.FC<LandingProps> = ({ onSelectPlan, onNavigate }) => {
   const [expandedSimple, setExpandedSimple] = useState(false);
 
   const handleSimpleClick = () => {
@@ -46,12 +47,22 @@ export const Landing: React.FC<LandingProps> = ({ onSelectPlan }) => {
             <p className="text-stone-200 text-lg mb-8 max-w-md">
                 Abonnement hebdomadaire de repas gastronomiques africains, mijotés avec passion et livrés chez vous.
             </p>
-            <button 
-                onClick={scrollToPricing}
-                className="bg-chef-orange text-white px-8 py-4 rounded-full font-medium text-lg flex items-center gap-2 hover:bg-orange-700 transition-all active:scale-95 shadow-lg shadow-orange-900/30"
-            >
-                Voir les formules <ArrowRight className="w-5 h-5" />
-            </button>
+            <div className="flex flex-wrap gap-4">
+              <button
+                  onClick={scrollToPricing}
+                  className="bg-chef-orange text-white px-8 py-4 rounded-full font-medium text-lg flex items-center gap-2 hover:bg-orange-700 transition-all active:scale-95 shadow-lg shadow-orange-900/30"
+              >
+                  Voir les formules <ArrowRight className="w-5 h-5" />
+              </button>
+              {onNavigate && (
+                <button
+                    onClick={() => onNavigate('LOGIN')}
+                    className="bg-white/10 backdrop-blur-md text-white px-6 py-4 rounded-full font-medium text-lg flex items-center gap-2 hover:bg-white/20 transition-all active:scale-95 border border-white/20"
+                >
+                    <LogIn className="w-5 h-5" /> Se connecter
+                </button>
+              )}
+            </div>
         </div>
       </div>
 

@@ -4,6 +4,8 @@ import { Landing } from './views/Landing';
 import { Checkout } from './views/Checkout';
 import { Dashboard } from './views/Dashboard';
 import { Admin } from './views/Admin';
+import { Login } from './views/Login';
+import { AdminLogin } from './views/AdminLogin';
 import { ViewState, PlanType, MealTime } from './types';
 import { CheckCircle } from 'lucide-react';
 
@@ -70,12 +72,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {currentView !== 'ADMIN' && currentView !== 'SUCCESS' && currentView !== 'DASHBOARD' && (
+      {currentView !== 'ADMIN' && currentView !== 'SUCCESS' && currentView !== 'DASHBOARD' && currentView !== 'LOGIN' && currentView !== 'ADMIN_LOGIN' && (
         <Header onNavigate={navigateTo} />
       )}
 
       <main className="flex-grow">
-        {currentView === 'HOME' && <Landing onSelectPlan={handlePlanSelection} />}
+        {currentView === 'HOME' && <Landing onSelectPlan={handlePlanSelection} onNavigate={navigateTo} />}
 
         {currentView === 'CHECKOUT' && (
           <Checkout
@@ -93,6 +95,28 @@ export default function App() {
         )}
 
         {currentView === 'ADMIN' && <Admin onBack={() => navigateTo('HOME')} />}
+
+        {currentView === 'LOGIN' && (
+          <Login
+            onLoginSuccess={(userId, fullName) => {
+              // TODO: Handle login success (store user info, navigate to dashboard)
+              console.log('Login success:', userId, fullName);
+              navigateTo('HOME');
+            }}
+            onSwitchToAdmin={() => navigateTo('ADMIN_LOGIN')}
+          />
+        )}
+
+        {currentView === 'ADMIN_LOGIN' && (
+          <AdminLogin
+            onLoginSuccess={(userId, fullName, userType) => {
+              // TODO: Handle admin login success (store user info, navigate to admin dashboard)
+              console.log('Admin login success:', userId, fullName, userType);
+              navigateTo('ADMIN');
+            }}
+            onSwitchToClient={() => navigateTo('LOGIN')}
+          />
+        )}
       </main>
 
       {/* Footer (only on Landing) */}
