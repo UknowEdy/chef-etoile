@@ -6,6 +6,12 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import ordersRouter from './routes/orders.js';
 import deliveryRouter from './routes/delivery.js';
+import authRouter from './routes/auth.js';
+import dishesRouter from './routes/dishes.js';
+import menuRouter from './routes/menu.js';
+import subscriptionsRouter from './routes/subscriptions.js';
+import paymentsRouter from './routes/payments.js';
+import referralsRouter from './routes/referrals.js';
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -62,6 +68,12 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // API Routes
+app.use('/api/auth', authRouter);
+app.use('/api/dishes', dishesRouter);
+app.use('/api/menu', menuRouter);
+app.use('/api/subscriptions', subscriptionsRouter);
+app.use('/api/payments', paymentsRouter);
+app.use('/api/referrals', referralsRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/delivery', deliveryRouter);
 
