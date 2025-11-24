@@ -58,7 +58,7 @@ export function AdminLogin({ onLoginSuccess, onSwitchToClient }: AdminLoginProps
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <img src="/images/logo.svg" alt="Chef Étoile" className="h-16 w-16" />
+          <img src="/images/logo.png" alt="Chef Étoile" className="h-16 w-16" />
         </div>
 
         <h1 className="font-serif text-3xl font-bold text-center text-chef-black mb-2">
