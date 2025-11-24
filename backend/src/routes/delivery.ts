@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import {
   getDeliveryRoute,
   getActiveDeliveries,
@@ -7,6 +7,7 @@ import {
   calculateDistance,
   getDeliveryStats
 } from '../controllers/deliveryController.js';
+import { Order } from '../models/Order.js';
 
 const router = express.Router();
 
@@ -52,5 +53,34 @@ router.get('/calculate-distance', calculateDistance);
  * @access  Public
  */
 router.get('/stats', getDeliveryStats);
+
+/**
+ * @route   GET /api/delivery/list
+ * @desc    Récupérer la liste des commandes pour un livreur
+ * @access  Public
+ * @query   driverId
+ */
+router.get('/list', async (req: Request, res: Response) => {
+  try {
+    const { driverId } = req.query;
+
+    // Get all confirmed orders (ready for delivery)
+    const orders = await Order.find({
+      status: { $in: ['CONFIRMED', 'READY', 'OUT_FOR_DELIVERY'] }
+    })
+      .sort({ status: 1, createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      data: orders
+    });
+  } catch (error) {
+    console.error('Erreur récupération livraisons:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erreur serveur'
+    });
+  }
+});
 
 export default router;
