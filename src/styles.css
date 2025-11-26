@@ -1,0 +1,332 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --gold: #D4AF37;
+  --gold-light: #F4E4B0;
+  --gold-dark: #B8941F;
+  --black: #111827;
+  --white: #FFFFFF;
+  --gray-light: #F3F4F6;
+  --gray: #6B7280;
+  --gray-border: #E5E7EB;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--gray-light);
+  color: var(--black);
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* AppShell - Conteneur smartphone */
+.app-shell {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  background: var(--white);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 480px) {
+  .app-shell {
+    box-shadow: none;
+  }
+}
+
+/* TopBar */
+.top-bar {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--gray-border);
+  background: var(--white);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.top-bar-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.top-bar-back {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  color: var(--gold);
+}
+
+.top-bar-action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  color: var(--gold);
+}
+
+/* BottomNav */
+.bottom-nav {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-top: 1px solid var(--gray-border);
+  background: var(--white);
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  padding: 8px;
+  text-decoration: none;
+  color: var(--gray);
+  font-size: 11px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: color 0.2s;
+}
+
+.bottom-nav-item.active {
+  color: var(--gold);
+}
+
+.bottom-nav-item svg {
+  transition: color 0.2s;
+}
+
+.bottom-nav-item.active svg {
+  color: var(--gold);
+}
+
+/* Page container */
+.page {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 16px;
+}
+
+.page-content {
+  padding: 16px;
+}
+
+/* Page Title */
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--gray);
+  margin-bottom: 24px;
+}
+
+/* Section */
+.section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 12px;
+}
+
+/* Buttons */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--gold);
+  color: var(--black);
+}
+
+.btn-primary:hover {
+  background: var(--gold-dark);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: var(--gray-border);
+  color: var(--black);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.btn-whatsapp {
+  background: #25D366;
+  color: var(--white);
+}
+
+.btn-whatsapp:active {
+  transform: scale(0.98);
+}
+
+  font-size: 16px;
+  color: var(--gray);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+/* Cards */
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray-border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.chef-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: var(--white);
+  border: 1px solid var(--gray-border);
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 12px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chef-card:hover {
+  border-color: var(--gold);
+}
+
+.chef-card:active {
+  transform: scale(0.98);
+}
+
+.chef-card-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: var(--gray-border);
+  object-fit: cover;
+}
+
+.chef-card-info {
+  flex: 1;
+}
+
+.chef-card-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 4px;
+}
+
+.chef-card-location {
+  font-size: 13px;
+  color: var(--gray);
+  margin-bottom: 4px;
+}
+
+.chef-card-distance {
+  font-size: 12px;
+  color: var(--gray);
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-success {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.badge-warning {
+  background: var(--gold-light);
+  color: var(--gold-dark);
+}
+
+/* Reste du CSS identique... */
+/* Hero section - RÉDUIT */
+.hero {
+  padding: 24px 16px 32px 16px;
+  text-align: center;
+}
+
+.hero-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hero-star {
+  color: var(--gold);
+  font-size: 32px;
+}
+
+.hero-description {
+  font-size: 16px;
+  color: var(--gray);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
