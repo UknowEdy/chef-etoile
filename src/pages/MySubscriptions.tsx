@@ -1,10 +1,13 @@
-import { Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Calendar, MapPin } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 import { PageTitle, Section, EmptyState } from '../components';
 
 export default function MySubscriptions() {
+  const navigate = useNavigate();
+
   // Mock data
   const subscriptions = [
     {
@@ -23,6 +26,15 @@ export default function MySubscriptions() {
       <TopBar showLogo={true} />
       <div className="page">
         <div className="page-content">
+          <button 
+            className="btn btn-primary"
+            onClick={() => navigate('/my/pickup-point')}
+            style={{ marginBottom: '24px' }}
+          >
+            <MapPin size={20} />
+            📍 Mon point de retrait
+          </button>
+
           <PageTitle 
             title="Mes abonnements" 
             subtitle="Gérez vos abonnements actifs"

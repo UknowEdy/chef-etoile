@@ -330,3 +330,24 @@ body {
   margin-bottom: 24px;
   line-height: 1.5;
 }
+
+/* Badges supplémentaires */
+.badge-error {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.badge-success {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.badge-warning {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.badge-info {
+  background: #DBEAFE;
+  color: #1E40AF;
+}

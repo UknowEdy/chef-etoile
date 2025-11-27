@@ -7,6 +7,7 @@ import ChefPage from './pages/ChefPage';
 import ChefMenu from './pages/ChefMenu';
 import Subscribe from './pages/Subscribe';
 import MySubscriptions from './pages/MySubscriptions';
+import MyPickupPoint from './pages/MyPickupPoint';
 import MyOrders from './pages/MyOrders';
 import Install from './pages/Install';
 
@@ -18,6 +19,7 @@ import ChefAdminMenuHistory from './pages/chef-admin/MenuHistory';
 import ChefAdminSubscribers from './pages/chef-admin/Subscribers';
 import ChefAdminOrders from './pages/chef-admin/Orders';
 import ChefAdminDelivery from './pages/chef-admin/Delivery';
+import ChefAdminDeliveryRoutes from './pages/chef-admin/DeliveryRoutes';
 import ChefAdminSettings from './pages/chef-admin/Settings';
 import ChefAdminMenuGallery from './pages/chef-admin/MenuGallery';
 
@@ -41,6 +43,7 @@ function App() {
         <Route path="/chef/:slug/menu" element={<ChefMenu />} />
         <Route path="/chef/:slug/subscribe" element={<Subscribe />} />
         <Route path="/my/subscriptions" element={<MySubscriptions />} />
+        <Route path="/my/pickup-point" element={<MyPickupPoint />} />
         <Route path="/my/orders" element={<MyOrders />} />
         <Route path="/install" element={<Install />} />
 
@@ -53,6 +56,7 @@ function App() {
         <Route path="/chef-admin/subscribers" element={<ChefAdminSubscribers />} />
         <Route path="/chef-admin/orders" element={<ChefAdminOrders />} />
         <Route path="/chef-admin/delivery" element={<ChefAdminDelivery />} />
+        <Route path="/chef-admin/delivery-routes" element={<ChefAdminDeliveryRoutes />} />
         <Route path="/chef-admin/settings" element={<ChefAdminSettings />} />
 
         {/* Super Admin routes */}
