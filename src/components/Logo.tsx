@@ -11,7 +11,7 @@ export function LogoIcon() {
         src="/images/logo-mini.png" 
         alt="Chef★" 
         style={{ 
-          height: '36px', 
+          height: '40px', 
           width: 'auto',
           objectFit: 'contain'
         }}

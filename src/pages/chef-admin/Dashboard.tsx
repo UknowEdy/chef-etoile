@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Truck, UtensilsCrossed, LogOut } from 'lucide-react';
+import { Calendar, Users, Truck, UtensilsCrossed, LogOut, Settings } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
 import { PageTitle, Section } from '../../components';
@@ -17,7 +17,8 @@ export default function ChefAdminDashboard() {
     { icon: <UtensilsCrossed size={24} />, label: 'Gérer les menus', path: '/chef-admin/menu' },
     { icon: <Users size={24} />, label: 'Mes abonnés', path: '/chef-admin/subscribers' },
     { icon: <Calendar size={24} />, label: 'Commandes du jour', path: '/chef-admin/orders' },
-    { icon: <Truck size={24} />, label: 'Livraisons', path: '/chef-admin/delivery' }
+    { icon: <Truck size={24} />, label: 'Livraisons', path: '/chef-admin/delivery' },
+      { icon: <Settings size={24} />, label: 'Paramètres', path: '/chef-admin/settings' },
   ];
 
   return (

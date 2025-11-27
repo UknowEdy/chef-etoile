@@ -18,6 +18,8 @@ import ChefAdminMenuHistory from './pages/chef-admin/MenuHistory';
 import ChefAdminSubscribers from './pages/chef-admin/Subscribers';
 import ChefAdminOrders from './pages/chef-admin/Orders';
 import ChefAdminDelivery from './pages/chef-admin/Delivery';
+import ChefAdminSettings from './pages/chef-admin/Settings';
+import ChefAdminMenuGallery from './pages/chef-admin/MenuGallery';
 
 // Super Admin pages
 import SuperAdminLogin from './pages/superadmin/Login';
@@ -45,9 +47,11 @@ function App() {
         <Route path="/chef-admin/dashboard" element={<ChefAdminDashboard />} />
         <Route path="/chef-admin/menu" element={<ChefAdminMenu />} />
         <Route path="/chef-admin/menu/history" element={<ChefAdminMenuHistory />} />
+        <Route path="/chef-admin/menu/gallery" element={<ChefAdminMenuGallery />} />
         <Route path="/chef-admin/subscribers" element={<ChefAdminSubscribers />} />
         <Route path="/chef-admin/orders" element={<ChefAdminOrders />} />
         <Route path="/chef-admin/delivery" element={<ChefAdminDelivery />} />
+        <Route path="/chef-admin/settings" element={<ChefAdminSettings />} />
 
         {/* Super Admin routes */}
         <Route path="/superadmin/login" element={<SuperAdminLogin />} />
