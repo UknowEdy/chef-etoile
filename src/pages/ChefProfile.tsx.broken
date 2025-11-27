@@ -1,0 +1,9 @@
+import { useParams } from 'react-router-dom';
+import { Star, MapPin, Phone } from 'lucide-react';
+import AppShell from '../components/AppShell';
+import TopBar from '../components/TopBar';
+import { PageTitle } from '../components';
+
+export default function ChefProfile() {
+  const { slug } = useParams();
+
