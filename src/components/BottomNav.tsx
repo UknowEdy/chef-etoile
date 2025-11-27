@@ -1,11 +1,13 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Search, Calendar, User } from 'lucide-react';
+
 export default function BottomNav() {
   const location = useLocation();
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path);
+  
   return (
     <div className="bottom-nav">
-      <Link to="/" className={`bottom-nav-item ${isActive('/') ? 'active' : ''}`}>
+      <Link to="/" className={`bottom-nav-item ${isActive('/') && location.pathname === '/' ? 'active' : ''}`}>
         <Home size={24} />
         <span>Accueil</span>
       </Link>
@@ -20,9 +22,9 @@ export default function BottomNav() {
         <span>Repas</span>
       </Link>
       
-      <Link to="/my/subscriptions" className={`bottom-nav-item ${isActive('/my/subscriptions') ? 'active' : ''}`}>
+      <Link to="/my/account" className={`bottom-nav-item ${isActive('/my') ? 'active' : ''}`}>
         <User size={24} />
-        <span>Abonnements</span>
+        <span>Mon Compte</span>
       </Link>
     </div>
   );

@@ -10,6 +10,9 @@ import DiscoverChefs from './pages/DiscoverChefs';
 import ChefProfile from './pages/ChefProfile';
 import MyOrders from './pages/MyOrders';
 import Install from './pages/Install';
+import Support from './pages/Support';
+import MyProfile from './pages/MyProfile';
+import MyAccount from './pages/MyAccount';
 // Chef Admin pages
 import ChefAdminLogin from './pages/chef-admin/Login';
 import ChefAdminDashboard from './pages/chef-admin/Dashboard';
@@ -21,6 +24,7 @@ import ChefAdminDelivery from './pages/chef-admin/Delivery';
 import ChefAdminDeliveryRoutes from './pages/chef-admin/DeliveryRoutes';
 import ChefAdminSettings from './pages/chef-admin/Settings';
 import ChefAdminMenuGallery from './pages/chef-admin/MenuGallery';
+import ChefAdminSupport from './pages/chef-admin/Support';
 // Super Admin pages
 import SuperAdminLogin from './pages/superadmin/Login';
 import SuperAdminDashboard from './pages/superadmin/Dashboard';
@@ -44,6 +48,12 @@ function App() {
           <Route path="/my/subscriptions" element={<MySubscriptions />} />
           <Route path="/my/pickup-point" element={<MyPickupPoint />} />
           <Route path="/my/orders" element={<MyOrders />} />
+          <Route path="/my/profile" element={<MyProfile />} />
+          <Route path="/my/account" element={<MyAccount />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/my/profile" element={<MyProfile />} />
+          <Route path="/my/account" element={<MyAccount />} />
+          <Route path="/support" element={<Support />} />
           <Route path="/install" element={<Install />} />
           {/* Chef Admin routes */}
           <Route path="/chef-admin/login" element={<ChefAdminLogin />} />
@@ -56,6 +66,7 @@ function App() {
           <Route path="/chef-admin/delivery" element={<ChefAdminDelivery />} />
           <Route path="/chef-admin/delivery-routes" element={<ChefAdminDeliveryRoutes />} />
           <Route path="/chef-admin/settings" element={<ChefAdminSettings />} />
+          <Route path="/chef-admin/support" element={<ChefAdminSupport />} />
           {/* Super Admin routes */}
           <Route path="/superadmin/login" element={<SuperAdminLogin />} />
           <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
