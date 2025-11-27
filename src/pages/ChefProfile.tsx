@@ -1,12 +1,14 @@
-import { useParams } from 'react-router-dom';
-import { Star, MapPin, Phone } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Star, MapPin, Phone, ChefHat } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
+import BottomNav from '../components/BottomNav';
 import { PageTitle } from '../components';
 
 export default function ChefProfile() {
   const { slug } = useParams();
-
+  const navigate = useNavigate();
+  
   const chefsData: any = {
     kodjo: { name: 'Chef Kodjo', quartier: 'Tokoin', phone: '+228 90 12 34 56', rating: 4.8, totalRatings: 127, subscribers: 24 },
     anna: { name: 'Chef Anna', quartier: 'Bè', phone: '+228 90 23 45 67', rating: 4.9, totalRatings: 203, subscribers: 18 },
@@ -26,7 +28,7 @@ export default function ChefProfile() {
             title={chef.name}
             subtitle={chef.quartier}
           />
-
+          
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(3, 1fr)', 
@@ -74,20 +76,31 @@ export default function ChefProfile() {
             <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px' }}>
               Menu cette semaine
             </div>
-            <div style={{ fontSize: '13px', color: '#6B7280' }}>
+            <div style={{ fontSize: '13px', color: '#6B7280', marginBottom: '12px' }}>
               Lundi : Riz sauce arachide<br />
               Mardi : Pâtes sauce tomate<br />
               Mercredi : Fufu sauce gombo<br />
               Jeudi : Attiéké poisson<br />
               Vendredi : Riz gras
             </div>
+            <button 
+              className="btn btn-secondary"
+              onClick={() => navigate(`/chefs/${slug}/menu`)}
+            >
+              <ChefHat size={20} />
+              Voir le menu complet
+            </button>
           </div>
 
-          <button className="btn btn-primary">
+          <button 
+            className="btn btn-primary"
+            onClick={() => navigate(`/chefs/${slug}/subscribe`)}
+          >
             S'abonner à {chef.name}
           </button>
         </div>
       </div>
+      <BottomNav />
     </AppShell>
   );
 }

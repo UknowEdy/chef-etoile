@@ -10,38 +10,86 @@ export default function Subscribe() {
   const { slug } = useParams();
   const [selectedPlan, setSelectedPlan] = useState<string>('');
 
-  const chef = {
-    name: 'Chef Kodjo',
-    phone: '22890123456'
+  // Données personnalisées par chef
+  const chefsData: any = {
+    kodjo: { 
+      name: 'Chef Kodjo', 
+      phone: '+228 90 12 34 56',
+      jours: 'lundi au samedi',
+      nbJours: 6,
+      plans: [
+        { id: 'midi', name: 'Formule Midi', price: '7 500 F', repas: 6 },
+        { id: 'soir', name: 'Formule Soir', price: '7 500 F', repas: 6 },
+        { id: 'complet', name: 'Formule Complète', price: '14 000 F', repas: 12 }
+      ]
+    },
+    anna: { 
+      name: 'Chef Anna', 
+      phone: '+228 90 23 45 67',
+      jours: 'lundi au vendredi',
+      nbJours: 5,
+      plans: [
+        { id: 'midi', name: 'Formule Midi', price: '6 500 F', repas: 5 },
+        { id: 'soir', name: 'Formule Soir', price: '6 500 F', repas: 5 },
+        { id: 'complet', name: 'Formule Complète', price: '12 000 F', repas: 10 }
+      ]
+    },
+    gloria: { 
+      name: 'Chef Gloria', 
+      phone: '+228 90 34 56 78',
+      jours: 'lundi, mercredi et vendredi',
+      nbJours: 3,
+      plans: [
+        { id: 'midi', name: 'Formule Midi', price: '4 000 F', repas: 3 },
+        { id: 'soir', name: 'Formule Soir', price: '4 000 F', repas: 3 },
+        { id: 'complet', name: 'Formule Complète', price: '7 500 F', repas: 6 }
+      ]
+    },
+    yao: { 
+      name: 'Chef Yao', 
+      phone: '+228 90 45 67 89',
+      jours: 'lundi au samedi',
+      nbJours: 6,
+      plans: [
+        { id: 'midi', name: 'Formule Midi', price: '8 000 F', repas: 6 },
+        { id: 'soir', name: 'Formule Soir', price: '8 000 F', repas: 6 },
+        { id: 'complet', name: 'Formule Complète', price: '15 000 F', repas: 12 }
+      ]
+    },
+    ama: { 
+      name: 'Chef Ama', 
+      phone: '+228 90 56 78 90',
+      jours: 'lundi au vendredi',
+      nbJours: 5,
+      plans: [
+        { id: 'midi', name: 'Formule Midi', price: '7 000 F', repas: 5 },
+        { id: 'soir', name: 'Formule Soir', price: '7 000 F', repas: 5 },
+        { id: 'complet', name: 'Formule Complète', price: '13 000 F', repas: 10 }
+      ]
+    }
   };
 
-  const plans = [
-    {
-      id: 'midi',
-      name: 'Formule Midi',
-      price: '7 500 F',
-      description: 'Repas du midi du lundi au samedi (6 repas)'
-    },
-    {
-      id: 'soir',
-      name: 'Formule Soir',
-      price: '7 500 F',
-      description: 'Repas du soir du lundi au samedi (6 repas)'
-    },
-    {
-      id: 'complet',
-      name: 'Formule Complète',
-      price: '14 000 F',
-      description: 'Midi et soir du lundi au samedi (12 repas)'
-    }
-  ];
+  const chef = chefsData[slug || 'kodjo'] || chefsData.kodjo;
 
   const handleSubscribe = () => {
-    const plan = plans.find(p => p.id === selectedPlan);
+    const plan = chef.plans.find((p: any) => p.id === selectedPlan);
     if (!plan) return;
+    
+    const message = `Bonjour ${chef.name} !
 
-    const message = `Bonjour ${chef.name}, je souhaite souscrire à la ${plan.name} (${plan.price}/semaine). Merci de me confirmer.`;
-    window.open(`https://wa.me/${chef.phone}?text=${encodeURIComponent(message)}`, '_blank');
+Je souhaite m'abonner à votre service :
+
+📋 *Formule choisie :* ${plan.name}
+💰 *Montant :* ${plan.price}/semaine
+📅 *Jours de livraison :* ${chef.jours}
+🍽️ *Nombre de repas :* ${plan.repas} repas/semaine
+
+Je confirme mon inscription et je vous enverrai mon transfert avec la preuve ici sur WhatsApp.
+
+Merci de me confirmer pour que je puisse procéder au paiement.`;
+
+    const phoneClean = chef.phone.replace(/\s/g, '');
+    window.open(`https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (
@@ -53,14 +101,14 @@ export default function Subscribe() {
             title="Choisissez votre formule" 
             subtitle="Sélectionnez l'abonnement qui vous convient"
           />
-
+          
           <Section>
-            {plans.map((plan) => (
+            {chef.plans.map((plan: any) => (
               <SubscriptionCard
                 key={plan.id}
                 name={plan.name}
                 price={plan.price}
-                description={plan.description}
+                description={`Repas du ${plan.id} du ${chef.jours} (${plan.repas} repas)`}
                 selected={selectedPlan === plan.id}
                 onClick={() => setSelectedPlan(plan.id)}
               />
@@ -70,11 +118,11 @@ export default function Subscribe() {
           <Section title="Informations importantes">
             <div className="card">
               <div style={{ fontSize: '13px', color: '#6B7280', lineHeight: '1.6' }}>
-                • Paiement hebdomadaire à l'avance<br/>
+                • Abonnement hebdomadaire renouvelable<br/>
+                • Paiement par Mobile Money avant activation<br/>
                 • Livraison incluse dans un rayon de 10 km<br/>
-                • Possibilité de mettre en pause votre abonnement<br/>
-                • Menus variés chaque semaine<br/>
-                • Confirmation par WhatsApp obligatoire
+                • Jours de livraison : {chef.jours}<br/>
+                • Preuve de transfert à envoyer sur WhatsApp
               </div>
             </div>
           </Section>
@@ -88,9 +136,9 @@ export default function Subscribe() {
             <MessageCircle size={20} />
             Confirmer via WhatsApp
           </button>
-
+          
           <div style={{ marginTop: '12px', textAlign: 'center', fontSize: '13px', color: '#6B7280' }}>
-            Vous serez redirigé vers WhatsApp pour finaliser votre abonnement
+            Le chef vous confirmera pour que vous puissiez faire le transfert
           </div>
         </div>
       </div>

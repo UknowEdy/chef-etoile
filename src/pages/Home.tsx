@@ -26,7 +26,7 @@ export default function Home() {
           <div className="hero-description">
             Abonnez-vous aux meilleurs chefs de votre quartier et recevez des repas frais chaque jour
           </div>
-          <button className="btn btn-primary" onClick={() => navigate('/find')}>
+          <button className="btn btn-primary" onClick={() => navigate('/discover')}>
             <MapPin size={20} />
             Trouver un Chef près de moi
           </button>

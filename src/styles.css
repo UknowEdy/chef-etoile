@@ -15,51 +15,62 @@
   --gray-border: #E5E7EB;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: var(--gray-light);
   color: var(--black);
-  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 #root {
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
+  overflow: hidden;
 }
 
-/* AppShell - Conteneur smartphone */
+/* AppShell - Conteneur smartphone (TAILLE FIXE) */
 .app-shell {
   width: 100%;
   max-width: 480px;
-  min-height: 100vh;
+  height: 100vh;
   background: var(--white);
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
   position: relative;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 @media (max-width: 480px) {
   .app-shell {
     box-shadow: none;
+    max-width: 100%;
   }
 }
 
 /* TopBar */
 .top-bar {
   height: 56px;
+  min-height: 56px;
+  max-height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
   border-bottom: 1px solid var(--gray-border);
   background: var(--white);
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   z-index: 100;
 }
 
@@ -92,13 +103,14 @@ body {
 /* BottomNav */
 .bottom-nav {
   height: 64px;
+  min-height: 64px;
+  max-height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-around;
   border-top: 1px solid var(--gray-border);
   background: var(--white);
-  position: sticky;
-  bottom: 0;
+  flex-shrink: 0;
   z-index: 100;
 }
 
@@ -130,15 +142,18 @@ body {
   color: var(--gold);
 }
 
-/* Page container */
+/* Page container - ZONE SCROLLABLE FIXE */
 .page {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 16px;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  height: 100%;
 }
 
 .page-content {
   padding: 16px;
+  min-height: 100%;
 }
 
 /* Page Title */
@@ -212,12 +227,6 @@ body {
 
 .btn-whatsapp:active {
   transform: scale(0.98);
-}
-
-  font-size: 16px;
-  color: var(--gray);
-  margin-bottom: 32px;
-  line-height: 1.5;
 }
 
 /* Cards */
@@ -301,8 +310,17 @@ body {
   color: var(--gold-dark);
 }
 
-/* Reste du CSS identique... */
-/* Hero section - RÉDUIT */
+.badge-error {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.badge-info {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+/* Hero section */
 .hero {
   padding: 24px 16px 32px 16px;
   text-align: center;
@@ -331,23 +349,169 @@ body {
   line-height: 1.5;
 }
 
-/* Badges supplémentaires */
-.badge-error {
-  background: #FEE2E2;
-  color: #991B1B;
+/* Subscription Cards */
+.subscription-card {
+  background: var(--white);
+  border: 2px solid var(--gray-border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.badge-success {
-  background: #D1FAE5;
-  color: #065F46;
+.subscription-card:hover {
+  border-color: var(--gold);
 }
 
-.badge-warning {
-  background: #FEF3C7;
-  color: #92400E;
+.subscription-card:active {
+  transform: scale(0.98);
 }
 
-.badge-info {
-  background: #DBEAFE;
-  color: #1E40AF;
+.subscription-card.selected {
+  border-color: var(--gold);
+  background: var(--gold-light);
+}
+
+.subscription-card-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 8px;
+}
+
+.subscription-card-price {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.subscription-card-description {
+  font-size: 13px;
+  color: var(--gray);
+  line-height: 1.5;
+}
+
+/* Menu Items */
+.menu-item {
+  background: var(--white);
+  border: 1px solid var(--gray-border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.menu-item-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 4px;
+}
+
+.menu-item-description {
+  font-size: 13px;
+  color: var(--gray);
+}
+
+/* Week Selector */
+.week-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.week-button {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--gray-border);
+  background: var(--white);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.week-button:hover {
+  border-color: var(--gold);
+}
+
+.week-button.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--black);
+  font-weight: 600;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 48px 16px;
+}
+
+.empty-state-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  color: var(--gray);
+}
+
+.empty-state-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 8px;
+}
+
+.empty-state-description {
+  font-size: 14px;
+  color: var(--gray);
+}
+
+/* Loader */
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--gray-border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Info Row */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gray-border);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row-label {
+  font-size: 14px;
+  color: var(--gray);
+}
+
+.info-row-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
 }

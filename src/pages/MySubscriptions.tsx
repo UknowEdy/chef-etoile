@@ -77,7 +77,7 @@ export default function MySubscriptions() {
                   <button 
                     className="btn btn-secondary"
                     style={{ marginTop: '12px' }}
-                    onClick={() => window.location.href = `/chef/${sub.chefSlug}`}
+                    onClick={() => window.location.href = `/chefs/${sub.chefSlug}`}
                   >
                     Voir le Chef★
                   </button>

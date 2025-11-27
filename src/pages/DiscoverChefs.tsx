@@ -4,6 +4,7 @@ import { MapPin, Star, Users } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
 import { PageTitle } from '../components';
+import BottomNav from '../components/BottomNav';
 
 interface Chef {
   id: string;
@@ -228,6 +229,7 @@ export default function DiscoverChefs() {
           </div>
         </div>
       </div>
+          <BottomNav />
     </AppShell>
   );
 }

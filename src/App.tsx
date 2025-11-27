@@ -2,8 +2,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import RootLayout from './components/RootLayout';
 // Client pages
 import Home from './pages/Home';
-import Find from './pages/Find';
-import ChefPage from './pages/ChefPage';
 import ChefMenu from './pages/ChefMenu';
 import Subscribe from './pages/Subscribe';
 import MySubscriptions from './pages/MySubscriptions';
@@ -39,14 +37,12 @@ function App() {
         <Routes>
           {/* Client routes */}
           <Route path="/" element={<Home />} />
-          <Route path="/find" element={<Find />} />
-          <Route path="/chef/:slug" element={<ChefPage />} />
-          <Route path="/chef/:slug/menu" element={<ChefMenu />} />
-          <Route path="/chef/:slug/subscribe" element={<Subscribe />} />
-          <Route path="/my/subscriptions" element={<MySubscriptions />} />
-          <Route path="/my/pickup-point" element={<MyPickupPoint />} />
           <Route path="/discover" element={<DiscoverChefs />} />
           <Route path="/chefs/:slug" element={<ChefProfile />} />
+          <Route path="/chefs/:slug/menu" element={<ChefMenu />} />
+          <Route path="/chefs/:slug/subscribe" element={<Subscribe />} />
+          <Route path="/my/subscriptions" element={<MySubscriptions />} />
+          <Route path="/my/pickup-point" element={<MyPickupPoint />} />
           <Route path="/my/orders" element={<MyOrders />} />
           <Route path="/install" element={<Install />} />
           {/* Chef Admin routes */}

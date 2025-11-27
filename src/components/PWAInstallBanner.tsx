@@ -44,9 +44,13 @@ export default function PWAInstallBanner() {
       gap: '12px',
       justifyContent: 'space-between',
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      position: 'sticky',
+      position: 'fixed',
       top: 0,
-      zIndex: 100
+      left: 0,
+      right: 0,
+      zIndex: 1000,
+      maxWidth: '480px',
+      margin: '0 auto'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
         <Download size={20} color="#111827" />
