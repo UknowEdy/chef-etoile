@@ -27,6 +27,8 @@ import SuperAdminDashboard from './pages/superadmin/Dashboard';
 import SuperAdminChefs from './pages/superadmin/Chefs';
 import SuperAdminNewChef from './pages/superadmin/NewChef';
 import SuperAdminConfig from './pages/superadmin/Config';
+import SuperAdminChefConfig from './pages/superadmin/ChefConfig';
+import SuperAdminUsers from './pages/superadmin/Users';
 
 function App() {
   return (
@@ -59,6 +61,8 @@ function App() {
         <Route path="/superadmin/chefs" element={<SuperAdminChefs />} />
         <Route path="/superadmin/chefs/new" element={<SuperAdminNewChef />} />
         <Route path="/superadmin/config" element={<SuperAdminConfig />} />
+        <Route path="/superadmin/chefs/:chefId/config" element={<SuperAdminChefConfig />} />
+        <Route path="/superadmin/users" element={<SuperAdminUsers />} />
       </Routes>
     </BrowserRouter>
   );

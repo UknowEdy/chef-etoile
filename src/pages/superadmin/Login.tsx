@@ -11,13 +11,12 @@ export default function SuperAdminLogin() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login
     navigate('/superadmin/dashboard');
   };
 
   return (
     <AppShell>
-      <TopBar title="Super Admin" showBack />
+      <TopBar showLogo={true} showBack />
       <div className="page">
         <div className="page-content">
           <div style={{ textAlign: 'center', padding: '48px 0 32px' }}>

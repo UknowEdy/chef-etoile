@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
-import { PageTitle } from '../../components';
+import { PageTitle, Section } from '../../components';
 
 export default function SuperAdminNewChef() {
   const navigate = useNavigate();
@@ -17,20 +17,28 @@ export default function SuperAdminNewChef() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock creation
+    alert(`Chef★ "${formData.name}" créé !`);
     navigate('/superadmin/chefs');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Auto-générer le slug depuis le nom
+    if (name === 'name' && !formData.slug) {
+      const slug = value.toLowerCase()
+        .replace(/chef\s*/gi, '')
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+      setFormData(prev => ({ ...prev, slug }));
+    }
   };
 
   return (
     <AppShell>
-      <TopBar title="Nouveau Chef★" showBack />
+      <TopBar showLogo={true} showBack />
       <div className="page">
         <div className="page-content">
           <PageTitle 
@@ -39,76 +47,84 @@ export default function SuperAdminNewChef() {
           />
 
           <form onSubmit={handleSubmit}>
-            <label className="label">Nom du Chef★</label>
-            <input 
-              type="text"
-              name="name"
-              className="input"
-              placeholder="Ex: Chef Kodjo"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
+            <Section title="Informations du Chef★">
+              <div className="card">
+                <label className="label">Nom du Chef★</label>
+                <input 
+                  type="text"
+                  name="name"
+                  className="input"
+                  placeholder="Ex: Chef Kodjo"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
 
-            <label className="label">Slug (URL)</label>
-            <input 
-              type="text"
-              name="slug"
-              className="input"
-              placeholder="Ex: kodjo"
-              value={formData.slug}
-              onChange={handleChange}
-              required
-            />
-            <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '12px', marginTop: '-8px' }}>
-              L'URL sera : chefetoile.com/{formData.slug || 'slug'}
-            </div>
+                <label className="label">Slug (URL)</label>
+                <input 
+                  type="text"
+                  name="slug"
+                  className="input"
+                  placeholder="Ex: kodjo"
+                  value={formData.slug}
+                  onChange={handleChange}
+                  required
+                />
+                <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '-8px', marginBottom: '12px' }}>
+                  L'URL sera : chefetoile.com/{formData.slug || 'slug'}
+                </div>
 
-            <label className="label">Email</label>
-            <input 
-              type="email"
-              name="email"
-              className="input"
-              placeholder="chef@email.com"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
+                <label className="label">Email</label>
+                <input 
+                  type="email"
+                  name="email"
+                  className="input"
+                  placeholder="chef@email.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
 
-            <label className="label">Téléphone WhatsApp</label>
-            <input 
-              type="tel"
-              name="phone"
-              className="input"
-              placeholder="+228 90 12 34 56"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-            />
+                <label className="label">Téléphone WhatsApp</label>
+                <input 
+                  type="tel"
+                  name="phone"
+                  className="input"
+                  placeholder="+228 90 12 34 56"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </Section>
 
-            <label className="label">Quartier</label>
-            <input 
-              type="text"
-              name="quartier"
-              className="input"
-              placeholder="Ex: Tokoin"
-              value={formData.quartier}
-              onChange={handleChange}
-              required
-            />
+            <Section title="Localisation">
+              <div className="card">
+                <label className="label">Quartier</label>
+                <input 
+                  type="text"
+                  name="quartier"
+                  className="input"
+                  placeholder="Ex: Tokoin"
+                  value={formData.quartier}
+                  onChange={handleChange}
+                  required
+                />
 
-            <label className="label">Adresse complète</label>
-            <input 
-              type="text"
-              name="address"
-              className="input"
-              placeholder="Rue et numéro"
-              value={formData.address}
-              onChange={handleChange}
-              required
-            />
+                <label className="label">Adresse complète</label>
+                <input 
+                  type="text"
+                  name="address"
+                  className="input"
+                  placeholder="Rue et numéro"
+                  value={formData.address}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </Section>
 
-            <div style={{ display: 'flex', gap: '8px', marginTop: '24px' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button 
                 type="button"
                 className="btn btn-secondary"

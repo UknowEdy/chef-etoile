@@ -20,13 +20,18 @@ export function LogoIcon() {
   );
 }
 
-// Logo complet pour page d'accueil
+// Logo complet - TAILLE FIXE 160px (comme la page d'accueil)
 export function LogoFull() {
   return (
     <img 
       src="/images/chef-etoile-logo.png" 
       alt="Chef★" 
-      style={{ height: '40px', width: 'auto' }}
+      style={{ 
+        width: '160px',
+        height: 'auto',
+        display: 'block',
+        margin: '0 auto'
+      }}
     />
   );
 }
