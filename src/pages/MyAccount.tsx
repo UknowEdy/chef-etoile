@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { User, CreditCard, LifeBuoy, UtensilsCrossed, MapPin, FileText, ChevronRight } from 'lucide-react';
+import { User, CreditCard, LifeBuoy, UtensilsCrossed, MapPin, FileText, ChevronRight, LogOut } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
@@ -54,7 +54,7 @@ export default function MyAccount() {
           <div style={{ marginBottom: '24px' }}>
             {menuItems.map((item) => (
               <div
-                key={item.path}
+                key={item.label}
                 onClick={() => navigate(item.path)}
                 style={{
                   display: 'flex',
@@ -101,6 +101,17 @@ export default function MyAccount() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="section">
+        <div 
+          className="card" 
+          style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+          onClick={() => navigate('/login')}
+        >
+          <LogOut size={20} color="#EF4444" />
+          <span style={{ color: '#EF4444', fontWeight: '600', fontSize: '15px' }}>Se déconnecter</span>
         </div>
       </div>
       <BottomNav />

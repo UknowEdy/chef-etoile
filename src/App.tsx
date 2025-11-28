@@ -13,6 +13,8 @@ import Install from './pages/Install';
 import Support from './pages/Support';
 import MyProfile from './pages/MyProfile';
 import MyAccount from './pages/MyAccount';
+import Login from './pages/Login';
+import Register from './pages/Register';
 // Chef Admin pages
 import ChefAdminLogin from './pages/chef-admin/Login';
 import ChefAdminDashboard from './pages/chef-admin/Dashboard';
@@ -52,6 +54,8 @@ function App() {
           <Route path="/my/account" element={<MyAccount />} />
           <Route path="/support" element={<Support />} />
           <Route path="/install" element={<Install />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           {/* Chef Admin routes */}
           <Route path="/chef-admin/login" element={<ChefAdminLogin />} />
           <Route path="/chef-admin/dashboard" element={<ChefAdminDashboard />} />

@@ -1,0 +1,27 @@
+:root {
+  /* COLORS */
+  --color-bg-dark: #111111;
+  --color-bg-light: #FFFFFF;
+  --color-text-light: #FFFFFF;
+  --color-text-muted: #CCCCCC;
+  --color-gold: #D4AF37;
+  --color-border: #1F1F1F;
+
+  /* SPACING */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+
+  /* RADIUS */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* SHADOWS */
+  --shadow-soft: 0 4px 12px rgba(0,0,0,0.25);
+
+  /* FONT */
+  --font-base: 'Inter', system-ui, sans-serif;
+}

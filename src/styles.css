@@ -238,6 +238,194 @@ body {
   margin-bottom: 12px;
 }
 
+/* --- Home & Dashboard Styles --- */
+.home-guest-container, .home-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.home-logo-section {
+  padding: 24px 16px 16px;
+  text-align: center;
+}
+
+.home-logo-img {
+  width: 140px;
+  height: auto;
+  margin: 0 auto 8px;
+  display: block;
+}
+
+.home-subtitle {
+  font-size: 14px;
+  color: var(--gray);
+  line-height: 1.4;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.action-card {
+  background: var(--white);
+  border: 1px solid var(--gray-border);
+  border-radius: 12px;
+  padding: 18px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-card:active {
+  background: var(--gray-light);
+}
+
+.action-card.primary:active {
+  background: var(--gold);
+}
+
+.info-card {
+  background: var(--white);
+  border: 1px solid var(--gray-border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.info-card h3, .subscriptions-section h3 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.info-card ol {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--gray);
+  padding-left: 14px;
+}
+
+.footer-pro {
+  padding-top: 12px;
+  border-top: 1px solid var(--gray-border);
+  text-align: center;
+}
+
+.footer-pro p {
+  font-size: 11px;
+  color: #9CA3AF;
+  margin-bottom: 8px;
+}
+
+.btn-small {
+  background: var(--white);
+  border: 1px solid var(--gray-border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 11px;
+  color: var(--black);
+  cursor: pointer;
+}
+
+.welcome-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.today-card {
+  background: var(--white);
+  border: 2px solid var(--black);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.today-card:active {
+  background: var(--gray-light);
+}
+
+.card-header {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.meal-row {
+  margin-bottom: 10px;
+}
+
+.meal-row:last-child {
+  margin-bottom: 0;
+}
+
+.meal-time {
+  font-size: 12px;
+  color: var(--gray);
+  margin-bottom: 2px;
+}
+
+.meal-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.meal-chef {
+  font-size: 11px;
+  color: var(--gray);
+}
+
+.subscriptions-section {
+  background: var(--white);
+  border: 1px solid var(--gray-border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.subscription-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--gray-border);
+}
+
+.subscription-item:last-child {
+  border-bottom: none;
+}
+
+.sub-chef {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sub-plan {
+  font-size: 11px;
+  color: var(--gray);
+}
+
+.sub-expiry {
+  font-size: 11px;
+  color: var(--gray);
+  text-align: right;
+}
+
+/* Helpers */
+.mb-2 { margin-bottom: 8px; }
+.gap-2 { gap: 8px; }
+.flex-center { display: flex; justify-content: center; align-items: center; }
+.whitespace-pre-line { white-space: pre-line; }
+.inline-icon { display: inline; margin-right: 4px; }
 .chef-card {
   display: flex;
   gap: 12px;
@@ -514,4 +702,36 @@ body {
   font-size: 14px;
   font-weight: 600;
   color: var(--black);
+}
+
+/* Forms */
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--black);
+}
+
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--gray-border);
+  margin-bottom: 16px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+
+.input:focus {
+  border-color: var(--gold);
+}
+
+.link {
+  color: var(--gold-dark);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
 }
