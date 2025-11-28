@@ -3,7 +3,7 @@ import { Home, Search, Calendar, User } from 'lucide-react';
 
 export default function BottomNav() {
   const location = useLocation();
-  const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path);
+  const isActive = (path: string) => location.pathname === path;
   
   return (
     <div className="bottom-nav">
@@ -22,7 +22,7 @@ export default function BottomNav() {
         <span>Repas</span>
       </Link>
       
-      <Link to="/my/account" className={`bottom-nav-item ${isActive('/my') ? 'active' : ''}`}>
+      <Link to="/my/account" className={`bottom-nav-item ${isActive('/my/account') ? 'active' : ''}`}>
         <User size={24} />
         <span>Mon Compte</span>
       </Link>

@@ -1,5 +1,11 @@
+import { ReactNode } from 'react';
 import PWAInstallBanner from './PWAInstallBanner';
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
       <PWAInstallBanner />

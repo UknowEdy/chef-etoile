@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 interface PageTitleProps {
   title: string;
@@ -38,7 +39,7 @@ interface ChefCardProps {
 
 export function ChefCard({ name, location, distance, image, slug }: ChefCardProps) {
   return (
-    <a href={`/chef/${slug}`} className="chef-card">
+    <Link to={`/chefs/${slug}`} className="chef-card">
       <img 
         src={image || '/placeholder-chef.jpg'} 
         alt={name}
@@ -49,7 +50,7 @@ export function ChefCard({ name, location, distance, image, slug }: ChefCardProp
         <div className="chef-card-location">{location}</div>
         <div className="chef-card-distance">{distance}</div>
       </div>
-    </a>
+    </Link>
   );
 }
 

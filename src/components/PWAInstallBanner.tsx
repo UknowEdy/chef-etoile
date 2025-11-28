@@ -1,14 +1,22 @@
 import { useState, useEffect } from 'react';
 import { X, Download } from 'lucide-react';
 
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => void;
+  userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed';
+    platform: string;
+  }>;
+};
+
 export default function PWAInstallBanner() {
   const [showBanner, setShowBanner] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
+    const handleBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setDeferredPrompt(event as BeforeInstallPromptEvent);
       const lastDismissed = localStorage.getItem('pwa-dismiss-date');
       const today = new Date().toDateString();
       if (lastDismissed !== today) {
@@ -21,11 +29,11 @@ export default function PWAInstallBanner() {
   }, []);
 
   const handleInstall = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      setShowBanner(false);
-    }
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    setShowBanner(false);
+    setDeferredPrompt(null);
   };
 
   const handleDismiss = () => {
@@ -84,6 +92,7 @@ export default function PWAInstallBanner() {
             display: 'flex',
             alignItems: 'center'
           }}
+          aria-label="Fermer la bannière d'installation"
         >
           <X size={18} color="#111827" />
         </button>

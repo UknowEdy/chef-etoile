@@ -86,7 +86,15 @@ export default function MyOrders() {
           {/* Repas d'aujourd'hui */}
           {todayIndex >= 0 && todayIndex < weeklyMeals.length && (
             <Section title="🔥 Aujourd'hui">
-              <div className="card" style={{ background: '#F4E4B0', border: '2px solid #D4AF37' }}>
+        <div
+          className="card"
+          style={{
+            background: 'transparent',
+            border: '1px solid #D4AF37',
+            padding: '16px',
+            borderRadius: '12px'
+          }}
+        >
                 <div style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px' }}>
                   {weeklyMeals[todayIndex].day}
                 </div>

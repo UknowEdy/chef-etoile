@@ -51,9 +51,6 @@ function App() {
           <Route path="/my/profile" element={<MyProfile />} />
           <Route path="/my/account" element={<MyAccount />} />
           <Route path="/support" element={<Support />} />
-          <Route path="/my/profile" element={<MyProfile />} />
-          <Route path="/my/account" element={<MyAccount />} />
-          <Route path="/support" element={<Support />} />
           <Route path="/install" element={<Install />} />
           {/* Chef Admin routes */}
           <Route path="/chef-admin/login" element={<ChefAdminLogin />} />
@@ -75,6 +72,7 @@ function App() {
           <Route path="/superadmin/config" element={<SuperAdminConfig />} />
           <Route path="/superadmin/chefs/:chefId/config" element={<SuperAdminChefConfig />} />
           <Route path="/superadmin/users" element={<SuperAdminUsers />} />
+          <Route path="*" element={<Home />} />
         </Routes>
       </RootLayout>
     </BrowserRouter>
