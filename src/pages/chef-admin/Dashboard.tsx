@@ -3,9 +3,11 @@ import { Calendar, Users, Truck, UtensilsCrossed, LogOut, Settings } from 'lucid
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
 import { PageTitle, Section } from '../../components';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ChefAdminDashboard() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const stats = [
     { label: 'Abonnés actifs', value: '24', color: '#111827' },
@@ -81,7 +83,10 @@ export default function ChefAdminDashboard() {
 
           <button 
             className="btn btn-secondary"
-            onClick={() => navigate('/')}
+            onClick={() => {
+              logout();
+              navigate('/chef-admin/login');
+            }}
           >
             <LogOut size={20} />
             Se déconnecter

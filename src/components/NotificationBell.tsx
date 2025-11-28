@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Bell, X } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
-// Types
-type UserRole = 'client' | 'chef' | 'admin';
+type UserRole = 'client' | 'chef' | 'admin' | 'guest';
 
 interface Notification {
   id: string;
@@ -12,36 +12,37 @@ interface Notification {
 }
 
 export default function NotificationBell() {
-  // TODO: À relier avec ton auth réelle plus tard
-  const userRole: UserRole = (localStorage.getItem('role') as UserRole) || 'client';
+  const { user } = useAuth();
+  const userRole: UserRole = user?.role ?? 'guest';
 
   const [showMenu, setShowMenu] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
-  // Charger les notifications selon le rôle
   useEffect(() => {
     let data: Notification[] = [];
 
-    if (userRole === 'client') {
-      data = [
-        { id: '1', message: 'Votre chef a publié le menu de la semaine.', type: 'info', icon: '✨' },
-        { id: '2', message: 'Votre abonnement expire bientôt.', type: 'warning', icon: '⚠️' }
-      ];
-    }
-
-    if (userRole === 'chef') {
-      data = [
-        { id: '1', message: 'Vous avez reçu 2 nouvelles commandes.', type: 'info', icon: '🍽️' },
-        { id: '2', message: 'Un client s’est abonné à votre menu.', type: 'info', icon: '🧑‍🍳' }
-      ];
-    }
-
-    if (userRole === 'admin') {
-      data = [
-        { id: '1', message: 'Un nouveau chef demande une validation.', type: 'warning', icon: '📝' },
-        { id: '2', message: '2 incidents signalés dans le support.', type: 'info', icon: '🚨' }
-      ];
+    switch (userRole) {
+      case 'client':
+        data = [
+          { id: '1', message: 'Votre chef a publié le menu de la semaine.', type: 'info', icon: '✨' },
+          { id: '2', message: 'Votre abonnement expire bientôt.', type: 'warning', icon: '⚠️' }
+        ];
+        break;
+      case 'chef':
+        data = [
+          { id: '1', message: 'Vous avez reçu de nouvelles commandes.', type: 'info', icon: '🍽️' },
+          { id: '2', message: 'Un client s’est abonné à votre menu.', type: 'info', icon: '🧑‍🍳' }
+        ];
+        break;
+      case 'admin':
+        data = [
+          { id: '1', message: 'Un nouveau chef demande une validation.', type: 'warning', icon: '📝' },
+          { id: '2', message: 'Incidents signalés dans le support.', type: 'info', icon: '🚨' }
+        ];
+        break;
+      default:
+        data = [];
     }
 
     setNotifications(data);

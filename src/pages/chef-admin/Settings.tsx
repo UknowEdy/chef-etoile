@@ -1,10 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
 import { Save } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
 import { PageTitle, Section } from '../../components';
+import { useAuth } from '../../context/AuthContext';
+import { StorageService } from '../../utils/storage';
 
 export default function ChefAdminSettings() {
+  const { user } = useAuth();
+  const chefSlug = user?.chefSlug || 'kodjo';
   const [settings, setSettings] = useState({
     prixMidi: '7500',
     prixSoir: '7500',
@@ -23,8 +27,18 @@ export default function ChefAdminSettings() {
     adresse: 'Tokoin, Lomé',
     horairesLivraison: '11h30-13h00 / 18h30-20h00'
   });
+  const [photo, setPhoto] = useState<string>('');
+
+  useEffect(() => {
+    if (!chefSlug) return;
+    const stored = StorageService.getChefPhoto(chefSlug);
+    if (stored) setPhoto(stored);
+  }, [chefSlug]);
 
   const handleSave = () => {
+    if (chefSlug && photo) {
+      StorageService.saveChefPhoto(chefSlug, photo);
+    }
     alert('Paramètres sauvegardés !');
   };
 
@@ -33,6 +47,16 @@ export default function ChefAdminSettings() {
       ...settings,
       joursService: { ...settings.joursService, [jour]: checked }
     });
+  };
+
+  const handlePhotoUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPhoto(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   const joursTotal = Object.values(settings.joursService).filter(Boolean).length;
@@ -46,6 +70,32 @@ export default function ChefAdminSettings() {
             title="Paramètres" 
             subtitle="Configurez vos tarifs et jours de service"
           />
+
+          <Section title="Photo de profil">
+            <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div
+                style={{
+                  width: '72px',
+                  height: '72px',
+                  borderRadius: '50%',
+                  background: photo ? `url(${photo}) center/cover` : '#F3F4F6',
+                  border: '1px solid #E5E7EB'
+                }}
+              />
+              <div style={{ flex: 1 }}>
+                <label className="label">Mettre à jour votre photo</label>
+                <input 
+                  type="file"
+                  accept="image/*"
+                  className="input"
+                  onChange={handlePhotoUpload}
+                />
+                <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
+                  Visible par les clients dans les recherches et votre profil.
+                </div>
+              </div>
+            </div>
+          </Section>
 
           <Section title="Tarifs d'abonnement">
             <div className="card">

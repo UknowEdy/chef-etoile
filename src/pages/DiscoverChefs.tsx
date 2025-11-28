@@ -5,6 +5,7 @@ import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
 import { PageTitle } from '../components';
 import BottomNav from '../components/BottomNav';
+import { StorageService } from '../utils/storage';
 
 interface Chef {
   id: string;
@@ -23,6 +24,7 @@ export default function DiscoverChefs() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [chefs, setChefs] = useState<Chef[]>([]);
   const [loading, setLoading] = useState(true);
+  const [photos, setPhotos] = useState<Record<string, string>>({});
 
   useEffect(() => {
     getUserLocationAndChefs();
@@ -125,12 +127,18 @@ export default function DiscoverChefs() {
       .slice(0, 5);
 
     setChefs(rankedChefs);
+    const photoMap: Record<string, string> = {};
+    rankedChefs.forEach((chef) => {
+      const stored = StorageService.getChefPhoto(chef.slug);
+      if (stored) photoMap[chef.slug] = stored;
+    });
+    setPhotos(photoMap);
     setLoading(false);
   };
 
   return (
     <AppShell>
-      <TopBar showLogo={true} />
+      <TopBar showLogo={true} showBack />
       <div className="page">
         <div className="page-content">
           <PageTitle 
@@ -161,7 +169,7 @@ export default function DiscoverChefs() {
                   key={chef.id}
                   className="card"
                   onClick={() => navigate(`/chefs/${chef.slug}`)}
-                  style={{ cursor: 'pointer', position: 'relative' }}
+                  style={{ cursor: 'pointer', position: 'relative', display: 'flex', gap: '12px', alignItems: 'center' }}
                 >
                   {/* Badge ranking */}
                   <div style={{
@@ -182,7 +190,20 @@ export default function DiscoverChefs() {
                     {index + 1}
                   </div>
 
-                  <div style={{ marginLeft: '40px' }}>
+                  <div
+                    style={{
+                      width: '64px',
+                      height: '64px',
+                      borderRadius: '50%',
+                      background: photos[chef.slug]
+                        ? `url(${photos[chef.slug]}) center/cover`
+                        : 'url(/images/chef-etoile-logo.png) center/cover',
+                      border: '1px solid #E5E7EB',
+                      marginLeft: '44px'
+                    }}
+                  />
+
+                  <div style={{ marginLeft: '12px', flex: 1 }}>
                     <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>
                       {chef.name}
                     </div>

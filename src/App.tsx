@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import RootLayout from './components/RootLayout';
 // Client pages
 import Home from './pages/Home';
@@ -38,48 +40,63 @@ import SuperAdminUsers from './pages/superadmin/Users';
 
 function App() {
   return (
-    <BrowserRouter>
-      <RootLayout>
-        <Routes>
-          {/* Client routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/discover" element={<DiscoverChefs />} />
-          <Route path="/chefs/:slug" element={<ChefProfile />} />
-          <Route path="/chefs/:slug/menu" element={<ChefMenu />} />
-          <Route path="/chefs/:slug/subscribe" element={<Subscribe />} />
-          <Route path="/my/subscriptions" element={<MySubscriptions />} />
-          <Route path="/my/pickup-point" element={<MyPickupPoint />} />
-          <Route path="/my/orders" element={<MyOrders />} />
-          <Route path="/my/profile" element={<MyProfile />} />
-          <Route path="/my/account" element={<MyAccount />} />
-          <Route path="/support" element={<Support />} />
-          <Route path="/install" element={<Install />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          {/* Chef Admin routes */}
-          <Route path="/chef-admin/login" element={<ChefAdminLogin />} />
-          <Route path="/chef-admin/dashboard" element={<ChefAdminDashboard />} />
-          <Route path="/chef-admin/menu" element={<ChefAdminMenu />} />
-          <Route path="/chef-admin/menu/history" element={<ChefAdminMenuHistory />} />
-          <Route path="/chef-admin/menu/gallery" element={<ChefAdminMenuGallery />} />
-          <Route path="/chef-admin/subscribers" element={<ChefAdminSubscribers />} />
-          <Route path="/chef-admin/orders" element={<ChefAdminOrders />} />
-          <Route path="/chef-admin/delivery" element={<ChefAdminDelivery />} />
-          <Route path="/chef-admin/delivery-routes" element={<ChefAdminDeliveryRoutes />} />
-          <Route path="/chef-admin/settings" element={<ChefAdminSettings />} />
-          <Route path="/chef-admin/support" element={<ChefAdminSupport />} />
-          {/* Super Admin routes */}
-          <Route path="/superadmin/login" element={<SuperAdminLogin />} />
-          <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
-          <Route path="/superadmin/chefs" element={<SuperAdminChefs />} />
-          <Route path="/superadmin/chefs/new" element={<SuperAdminNewChef />} />
-          <Route path="/superadmin/config" element={<SuperAdminConfig />} />
-          <Route path="/superadmin/chefs/:chefId/config" element={<SuperAdminChefConfig />} />
-          <Route path="/superadmin/users" element={<SuperAdminUsers />} />
-          <Route path="*" element={<Home />} />
-        </Routes>
-      </RootLayout>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <RootLayout>
+          <Routes>
+            {/* --- ZONE PUBLIQUE --- */}
+            <Route path="/" element={<Home />} />
+            <Route path="/discover" element={<DiscoverChefs />} />
+            <Route path="/chefs/:slug" element={<ChefProfile />} />
+            <Route path="/chefs/:slug/menu" element={<ChefMenu />} />
+            <Route path="/chefs/:slug/subscribe" element={<Subscribe />} />
+            <Route path="/install" element={<Install />} />
+            <Route path="/support" element={<Support />} />
+
+            {/* Auth */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/chef-admin/login" element={<ChefAdminLogin />} />
+            <Route path="/superadmin/login" element={<SuperAdminLogin />} />
+
+            {/* --- ZONE CLIENT (logged) --- */}
+            <Route element={<ProtectedRoute allowedRoles={['client', 'chef', 'admin']} />}>
+              <Route path="/my/orders" element={<MyOrders />} />
+              <Route path="/my/subscriptions" element={<MySubscriptions />} />
+              <Route path="/my/pickup-point" element={<MyPickupPoint />} />
+              <Route path="/my/profile" element={<MyProfile />} />
+              <Route path="/my/account" element={<MyAccount />} />
+            </Route>
+
+            {/* --- ZONE CHEF --- */}
+            <Route element={<ProtectedRoute allowedRoles={['chef']} />}>
+              <Route path="/chef-admin/dashboard" element={<ChefAdminDashboard />} />
+              <Route path="/chef-admin/menu" element={<ChefAdminMenu />} />
+              <Route path="/chef-admin/menu/history" element={<ChefAdminMenuHistory />} />
+              <Route path="/chef-admin/menu/gallery" element={<ChefAdminMenuGallery />} />
+              <Route path="/chef-admin/subscribers" element={<ChefAdminSubscribers />} />
+              <Route path="/chef-admin/orders" element={<ChefAdminOrders />} />
+              <Route path="/chef-admin/delivery" element={<ChefAdminDelivery />} />
+              <Route path="/chef-admin/delivery-routes" element={<ChefAdminDeliveryRoutes />} />
+              <Route path="/chef-admin/settings" element={<ChefAdminSettings />} />
+              <Route path="/chef-admin/support" element={<ChefAdminSupport />} />
+            </Route>
+
+            {/* --- ZONE ADMIN --- */}
+            <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+              <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
+              <Route path="/superadmin/chefs" element={<SuperAdminChefs />} />
+              <Route path="/superadmin/chefs/new" element={<SuperAdminNewChef />} />
+              <Route path="/superadmin/config" element={<SuperAdminConfig />} />
+              <Route path="/superadmin/chefs/:chefId/config" element={<SuperAdminChefConfig />} />
+              <Route path="/superadmin/users" element={<SuperAdminUsers />} />
+            </Route>
+
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </RootLayout>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

@@ -3,16 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import { ChefHat } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ChefAdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login
-    navigate('/chef-admin/dashboard');
+    setError('');
+
+    let chefSlug = '';
+    if (email === 'chef@test.com' && password === '123') {
+      chefSlug = 'kodjo';
+      login('chef', email, chefSlug);
+      navigate('/chef-admin/dashboard');
+    } else {
+      setError('Email ou mot de passe incorrect.');
+    }
   };
 
   return (
@@ -39,6 +50,9 @@ export default function ChefAdminLogin() {
             <p style={{ fontSize: '14px', color: '#6B7280' }}>
               Gérez vos menus et abonnés
             </p>
+            <p style={{ fontSize: '12px', color: '#10B981', marginTop: '10px', padding: '5px', border: '1px dashed #A7F3D0', borderRadius: '5px' }}>
+              Test: chef@test.com / 123 (Chef Kodjo)
+            </p>
           </div>
 
           <form onSubmit={handleLogin}>
@@ -62,6 +76,12 @@ export default function ChefAdminLogin() {
               required
             />
 
+            {error && (
+              <div style={{ color: '#EF4444', fontSize: '14px', marginBottom: '10px' }}>
+                {error}
+              </div>
+            )}
+            
             <button type="submit" className="btn btn-primary">
               Se connecter
             </button>

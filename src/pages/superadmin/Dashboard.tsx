@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import { ChefHat, Users, Settings, LogOut } from 'lucide-react';
+import { ChefHat, Users, Settings, LogOut, Shield } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import { LogoFull } from '../../components/Logo';
+import { useAuth } from '../../context/AuthContext';
 
 export default function SuperAdminDashboard() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const stats = [
     { label: 'Chefs★ actifs', value: '12' },
@@ -34,6 +36,12 @@ export default function SuperAdminDashboard() {
             textAlign: 'center'
           }}>
             Administration
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 12px', borderRadius: '12px', border: '1px solid #111827', color: '#111827', fontWeight: 600 }}>
+              <Shield size={16} />
+              Zone SuperAdmin
+            </span>
           </div>
           <div style={{ 
             fontSize: '14px', 
@@ -101,7 +109,10 @@ export default function SuperAdminDashboard() {
           {/* Déconnexion */}
           <button 
             className="btn btn-secondary"
-            onClick={() => navigate('/superadmin/login')}
+            onClick={() => {
+              logout();
+              navigate('/superadmin/login');
+            }}
           >
             <LogOut size={20} />
             Se déconnecter

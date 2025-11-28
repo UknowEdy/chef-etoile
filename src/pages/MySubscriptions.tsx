@@ -1,29 +1,29 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, MapPin } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 import { PageTitle, Section, EmptyState } from '../components';
+import { StorageService, Subscription } from '../utils/storage';
+import { useAuth } from '../context/AuthContext';
 
 export default function MySubscriptions() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const clientEmail = user?.email;
 
-  // Mock data
-  const subscriptions = [
-    {
-      id: '1',
-      chefName: 'Chef Kodjo',
-      chefSlug: 'kodjo',
-      plan: 'Formule Complète',
-      price: '14 000 F',
-      status: 'active',
-      nextPayment: '05 Dec 2024'
-    }
-  ];
+  useEffect(() => {
+    if (!clientEmail) return;
+    const allSubs = StorageService.getSubscriptions();
+    const mySubs = allSubs.filter((sub) => sub.clientEmail === clientEmail);
+    setSubscriptions(mySubs);
+  }, [clientEmail]);
 
   return (
     <AppShell>
-      <TopBar showLogo={true} />
+      <TopBar showLogo={true} showBack />
       <div className="page">
         <div className="page-content">
           <button 
@@ -50,7 +50,7 @@ export default function MySubscriptions() {
                         {sub.chefName}
                       </div>
                       <div style={{ fontSize: '14px', color: '#6B7280' }}>
-                        {sub.plan}
+                        {sub.planName}
                       </div>
                     </div>
                     <span className="badge badge-success">Actif</span>
@@ -66,18 +66,18 @@ export default function MySubscriptions() {
                   }}>
                     <div>
                       <span style={{ color: '#6B7280' }}>Montant:</span>
-                      <span style={{ fontWeight: 600, marginLeft: '8px' }}>{sub.price}/sem</span>
+                      <span style={{ fontWeight: 600, marginLeft: '8px' }}>{sub.price}</span>
                     </div>
                     <div>
-                      <span style={{ color: '#6B7280' }}>Prochain paiement:</span>
-                      <span style={{ fontWeight: 600, marginLeft: '8px' }}>{sub.nextPayment}</span>
+                      <span style={{ color: '#6B7280' }}>Début:</span>
+                      <span style={{ fontWeight: 600, marginLeft: '8px' }}>{sub.startDate}</span>
                     </div>
                   </div>
                   
                   <button 
                     className="btn btn-secondary"
                     style={{ marginTop: '12px' }}
-                    onClick={() => window.location.href = `/chefs/${sub.chefSlug}`}
+                    onClick={() => navigate(`/chefs/${sub.chefSlug}`)}
                   >
                     Voir le Chef★
                   </button>

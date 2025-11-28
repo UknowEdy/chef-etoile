@@ -1,13 +1,17 @@
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, MapPin, Phone, ChefHat } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 import { PageTitle } from '../components';
+import { StorageService } from '../utils/storage';
 
 export default function ChefProfile() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const [photo, setPhoto] = useState<string | null>(null);
+  const chefSlug = slug || 'kodjo';
   
   const chefsData: any = {
     kodjo: { name: 'Chef Kodjo', quartier: 'Tokoin', phone: '+228 90 12 34 56', rating: 4.8, totalRatings: 127, subscribers: 24 },
@@ -16,8 +20,12 @@ export default function ChefProfile() {
     yao: { name: 'Chef Yao', quartier: 'Adidogomé', phone: '+228 90 45 67 89', rating: 4.6, totalRatings: 156, subscribers: 15 },
     ama: { name: 'Chef Ama', quartier: 'Nyékonakpoè', phone: '+228 90 56 78 90', rating: 4.5, totalRatings: 67, subscribers: 22 }
   };
-  
-  const chef = chefsData[slug || ''] || chefsData.kodjo;
+  const chef = chefsData[chefSlug] || chefsData.kodjo;
+
+  useEffect(() => {
+    const stored = StorageService.getChefPhoto(chefSlug);
+    if (stored) setPhoto(stored);
+  }, [chefSlug]);
 
   return (
     <AppShell>
@@ -28,6 +36,21 @@ export default function ChefProfile() {
             title={chef.name}
             subtitle={chef.quartier}
           />
+
+          <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+            <div
+              style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: photo ? `url(${photo}) center/cover` : 'url(/images/chef-etoile-logo.png) center/cover',
+                border: '1px solid #E5E7EB'
+              }}
+            />
+            <div style={{ fontSize: '13px', color: '#6B7280' }}>
+              Photo visible par vos clients. Mettez-la à jour dans vos Paramètres Chef★.
+            </div>
+          </div>
           
           <div style={{ 
             display: 'grid', 

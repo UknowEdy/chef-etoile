@@ -1,14 +1,19 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 import { PageTitle, Section, SubscriptionCard } from '../components';
+import { StorageService } from '../utils/storage';
+import { useAuth } from '../context/AuthContext';
 
 export default function Subscribe() {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const [selectedPlan, setSelectedPlan] = useState<string>('');
+  const { user } = useAuth();
+  const clientEmail = user?.email || 'unknown@client.com';
 
   // Données personnalisées par chef
   const chefsData: any = {
@@ -73,8 +78,19 @@ export default function Subscribe() {
 
   const handleSubscribe = () => {
     const plan = chef.plans.find((p: any) => p.id === selectedPlan);
-    if (!plan) return;
+    if (!plan || !user) return;
+
+    // 1. Sauvegarder dans le stockage local
+    StorageService.addSubscription({
+      clientEmail,
+      chefSlug: slug || 'kodjo',
+      chefName: chef.name,
+      planId: plan.id,
+      planName: plan.name,
+      price: plan.price
+    });
     
+    // 2. Préparer le message WhatsApp
     const message = `Bonjour ${chef.name} !
 
 Je souhaite m'abonner à votre service :
@@ -84,12 +100,15 @@ Je souhaite m'abonner à votre service :
 📅 *Jours de livraison :* ${chef.jours}
 🍽️ *Nombre de repas :* ${plan.repas} repas/semaine
 
-Je confirme mon inscription et je vous enverrai mon transfert avec la preuve ici sur WhatsApp.
-
-Merci de me confirmer pour que je puisse procéder au paiement.`;
+Je confirme mon inscription et je vous enverrai mon transfert avec la preuve ici sur WhatsApp.`;
 
     const phoneClean = chef.phone.replace(/\s/g, '');
+    
+    // 3. Ouvrir WhatsApp
     window.open(`https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`, '_blank');
+
+    // 4. Rediriger l'utilisateur vers "Mes abonnements"
+    navigate('/my/subscriptions');
   };
 
   return (

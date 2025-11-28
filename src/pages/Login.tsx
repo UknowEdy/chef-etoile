@@ -3,17 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
+import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Login réel API
-    console.log('Login client:', email);
-    navigate('/');
+    setError('');
+
+    if (email === 'client@test.com' && password === '123') {
+      login('client', email);
+      navigate('/my/account');
+    } else {
+      setError('Email ou mot de passe incorrect.');
+    }
   };
 
   return (
@@ -40,6 +48,9 @@ export default function Login() {
             <p style={{ fontSize: '14px', color: '#6B7280' }}>
               Connectez-vous pour commander
             </p>
+            <p style={{ fontSize: '12px', color: '#10B981', marginTop: '10px', padding: '5px', border: '1px dashed #A7F3D0', borderRadius: '5px' }}>
+              Test: client@test.com / 123
+            </p>
           </div>
 
           <form onSubmit={handleLogin}>
@@ -62,6 +73,12 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            
+            {error && (
+              <div style={{ color: '#EF4444', fontSize: '14px', marginBottom: '10px' }}>
+                {error}
+              </div>
+            )}
 
             <button type="submit" className="btn btn-primary">
               Se connecter
@@ -69,7 +86,7 @@ export default function Login() {
           </form>
 
           <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '14px', color: '#6B7280' }}>
-            Pas encore de compte?{' '}
+            Pas encore de compte ?{' '}
             <span onClick={() => navigate('/register')} className="link">
               Créer un compte
             </span>
