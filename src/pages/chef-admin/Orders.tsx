@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { CheckCircle, Clock, Utensils, Printer } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
+import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle, Section, EmptyState } from '../../components';
 import { StorageService } from '../../utils/storage';
 import { useAuth } from '../../context/AuthContext';
@@ -202,6 +203,7 @@ export default function ChefAdminOrders() {
           )}
         </div>
       </div>
+      <ChefBottomNav />
     </AppShell>
   );
 }

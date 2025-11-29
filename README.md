@@ -80,13 +80,13 @@ chefetoile-frontend/
 - `/install` - Installer la PWA
 
 ### Chef Admin
-- `/chef-admin/login` - Connexion Chef
-- `/chef-admin/dashboard` - Tableau de bord
-- `/chef-admin/menu` - Gérer les menus
-- `/chef-admin/menu/history` - Historique des menus
-- `/chef-admin/subscribers` - Mes abonnés
-- `/chef-admin/orders` - Commandes du jour
-- `/chef-admin/delivery` - Livraisons
+- `/chef/login` - Connexion Chef
+- `/chef/dashboard` - Tableau de bord
+- `/chef/menu` - Gérer les menus
+- `/chef/menu/history` - Historique des menus
+- `/chef/subscribers` - Mes abonnés
+- `/chef/orders` - Commandes du jour
+- `/chef/delivery` - Livraisons
 
 ### Super Admin
 - `/superadmin/login` - Connexion Super Admin

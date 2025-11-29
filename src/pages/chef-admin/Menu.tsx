@@ -3,6 +3,7 @@ import { Save, Calendar, Utensils, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
+import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle, Section, EmptyState } from '../../components';
 import { useAuth } from '../../context/AuthContext';
 import { StorageService, DayMenu } from '../../utils/storage';
@@ -70,13 +71,13 @@ export default function ChefAdminMenu() {
           <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
             <button
               className="btn btn-secondary"
-              onClick={() => navigate('/chef-admin/menu/gallery')}
+              onClick={() => navigate('/chef/menu/gallery')}
             >
               Galerie Plats
             </button>
             <button
               className="btn btn-secondary"
-              onClick={() => navigate('/chef-admin/menu/history')}
+              onClick={() => navigate('/chef/menu/history')}
             >
               Historique
             </button>
@@ -139,6 +140,7 @@ export default function ChefAdminMenu() {
           </button>
         </div>
       </div>
+      <ChefBottomNav />
     </AppShell>
   );
 }

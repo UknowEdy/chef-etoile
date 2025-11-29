@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import RootLayout from './components/RootLayout';
@@ -37,6 +37,7 @@ import SuperAdminNewChef from './pages/superadmin/NewChef';
 import SuperAdminConfig from './pages/superadmin/Config';
 import SuperAdminChefConfig from './pages/superadmin/ChefConfig';
 import SuperAdminUsers from './pages/superadmin/Users';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -56,7 +57,7 @@ function App() {
             {/* Auth */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/chef-admin/login" element={<ChefAdminLogin />} />
+            <Route path="/chef/login" element={<ChefAdminLogin />} />
             <Route path="/superadmin/login" element={<SuperAdminLogin />} />
 
             {/* --- ZONE CLIENT (logged) --- */}
@@ -70,16 +71,16 @@ function App() {
 
             {/* --- ZONE CHEF --- */}
             <Route element={<ProtectedRoute allowedRoles={['chef']} />}>
-              <Route path="/chef-admin/dashboard" element={<ChefAdminDashboard />} />
-              <Route path="/chef-admin/menu" element={<ChefAdminMenu />} />
-              <Route path="/chef-admin/menu/history" element={<ChefAdminMenuHistory />} />
-              <Route path="/chef-admin/menu/gallery" element={<ChefAdminMenuGallery />} />
-              <Route path="/chef-admin/subscribers" element={<ChefAdminSubscribers />} />
-              <Route path="/chef-admin/orders" element={<ChefAdminOrders />} />
-              <Route path="/chef-admin/delivery" element={<ChefAdminDelivery />} />
-              <Route path="/chef-admin/delivery-routes" element={<ChefAdminDeliveryRoutes />} />
-              <Route path="/chef-admin/settings" element={<ChefAdminSettings />} />
-              <Route path="/chef-admin/support" element={<ChefAdminSupport />} />
+              <Route path="/chef/dashboard" element={<ChefAdminDashboard />} />
+              <Route path="/chef/menu" element={<ChefAdminMenu />} />
+              <Route path="/chef/menu/history" element={<ChefAdminMenuHistory />} />
+              <Route path="/chef/menu/gallery" element={<ChefAdminMenuGallery />} />
+              <Route path="/chef/subscribers" element={<ChefAdminSubscribers />} />
+              <Route path="/chef/orders" element={<ChefAdminOrders />} />
+              <Route path="/chef/delivery" element={<ChefAdminDelivery />} />
+              <Route path="/chef/delivery-routes" element={<ChefAdminDeliveryRoutes />} />
+              <Route path="/chef/settings" element={<ChefAdminSettings />} />
+              <Route path="/chef/support" element={<ChefAdminSupport />} />
             </Route>
 
             {/* --- ZONE ADMIN --- */}
@@ -92,7 +93,7 @@ function App() {
               <Route path="/superadmin/users" element={<SuperAdminUsers />} />
             </Route>
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </RootLayout>
       </BrowserRouter>

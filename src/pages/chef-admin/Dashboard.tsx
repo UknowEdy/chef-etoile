@@ -1,26 +1,40 @@
 import { useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
 import { Calendar, Users, Truck, UtensilsCrossed, LogOut, Settings } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
+import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle, Section } from '../../components';
 import { useAuth } from '../../context/AuthContext';
+import { StorageService } from '../../utils/storage';
+
+type StatCard = {
+  label: string;
+  value: string;
+  color: string;
+  extra?: string;
+};
 
 export default function ChefAdminDashboard() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
-  const stats = [
+  const chefSlug = user?.chefSlug || 'kodjo';
+  const ratingStats = useMemo(() => StorageService.getChefRatingStats(chefSlug), [chefSlug]);
+
+  const stats: StatCard[] = [
+    { label: 'Note moyenne', value: `${ratingStats.average.toFixed(1)}★`, color: '#D97706', extra: `${ratingStats.count} vote${ratingStats.count > 1 ? 's' : ''}`},
     { label: 'Abonnés actifs', value: '24', color: '#111827' },
     { label: 'Repas du jour', value: '36', color: '#6B7280' },
     { label: 'Livraisons', value: '12', color: '#6B7280' }
   ];
 
   const menuItems = [
-    { icon: <UtensilsCrossed size={24} />, label: 'Gérer les menus', path: '/chef-admin/menu' },
-    { icon: <Users size={24} />, label: 'Mes abonnés', path: '/chef-admin/subscribers' },
-    { icon: <Calendar size={24} />, label: 'Commandes du jour', path: '/chef-admin/orders' },
-    { icon: <Truck size={24} />, label: 'Livraisons', path: '/chef-admin/delivery' },
-      { icon: <Settings size={24} />, label: 'Paramètres', path: '/chef-admin/settings' },
+    { icon: <UtensilsCrossed size={24} />, label: 'Gérer les menus', path: '/chef/menu' },
+    { icon: <Users size={24} />, label: 'Mes abonnés', path: '/chef/subscribers' },
+    { icon: <Calendar size={24} />, label: 'Commandes du jour', path: '/chef/orders' },
+    { icon: <Truck size={24} />, label: 'Livraisons', path: '/chef/delivery' },
+      { icon: <Settings size={24} />, label: 'Paramètres', path: '/chef/settings' },
   ];
 
   return (
@@ -49,6 +63,11 @@ export default function ChefAdminDashboard() {
                   <div style={{ fontSize: '12px', color: '#6B7280' }}>
                     {stat.label}
                   </div>
+                  {'extra' in stat && stat.extra ? (
+                    <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '4px' }}>
+                      {stat.extra}
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -85,7 +104,7 @@ export default function ChefAdminDashboard() {
             className="btn btn-secondary"
             onClick={() => {
               logout();
-              navigate('/chef-admin/login');
+              navigate('/chef/login');
             }}
           >
             <LogOut size={20} />
@@ -93,6 +112,7 @@ export default function ChefAdminDashboard() {
           </button>
         </div>
       </div>
+      <ChefBottomNav />
     </AppShell>
   );
 }

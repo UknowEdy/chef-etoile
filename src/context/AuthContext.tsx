@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // Les rôles possibles dans l'application
 export type UserRole = 'guest' | 'client' | 'chef' | 'admin';
@@ -18,22 +18,39 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const STORAGE_KEY = 'chef_etoile_user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Simulation de login (à remplacer par API plus tard)
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed: User = JSON.parse(stored);
+        setUser(parsed);
+      } catch (e) {
+        console.error('Erreur parsing session', e);
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+    setIsLoading(false);
+  }, []);
+
   const login = (role: UserRole, email: string, chefSlug?: string) => {
     setIsLoading(true);
     setTimeout(() => {
-      setUser({ name: 'Utilisateur Test', role, email, chefSlug });
+      const nextUser: User = { name: 'Utilisateur Test', role, email, chefSlug };
+      setUser(nextUser);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
       setIsLoading(false);
     }, 500);
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem(STORAGE_KEY);
   };
 
   return (

@@ -4,6 +4,7 @@ import { Plus, X, MapPin, Phone, Mail, DollarSign } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
 import { PageTitle } from '../../components';
+import SuperAdminBottomNav from '../../components/SuperAdminBottomNav';
 
 interface Chef {
   id: string;
@@ -248,6 +249,7 @@ export default function SuperAdminChefs() {
           )}
         </div>
       </div>
+      <SuperAdminBottomNav />
     </AppShell>
   );
 }

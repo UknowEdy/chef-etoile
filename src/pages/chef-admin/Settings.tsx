@@ -2,6 +2,7 @@ import { useEffect, useState, ChangeEvent } from 'react';
 import { Save } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
+import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle, Section } from '../../components';
 import { useAuth } from '../../context/AuthContext';
 import { StorageService } from '../../utils/storage';
@@ -244,6 +245,7 @@ export default function ChefAdminSettings() {
           </div>
         </div>
       </div>
+      <ChefBottomNav />
     </AppShell>
   );
 }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MessageCircle, AlertCircle, HelpCircle, Phone } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
+import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle, Section } from '../../components';
 
 export default function ChefSupport() {
@@ -152,6 +153,7 @@ Merci de me répondre rapidement.`;
           </Section>
         </div>
       </div>
+      <ChefBottomNav />
     </AppShell>
   );
 }

@@ -29,7 +29,7 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     
     // B. Seulement si c'est une page EXCLUSIVE Chef (sans accès client)
     if (allowedRoles.includes('chef')) {
-      return <Navigate to="/chef-admin/login" replace />;
+      return <Navigate to="/chef/login" replace />;
     }
 
     // C. Seulement si c'est une page EXCLUSIVE Admin
@@ -44,7 +44,7 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   // 2. Si connecté mais n'a pas le bon rôle
   if (!allowedRoles.includes(user.role)) {
     // On le renvoie vers son dashboard respectif au lieu de juste l'accueil
-    if (user.role === 'chef') return <Navigate to="/chef-admin/dashboard" replace />;
+    if (user.role === 'chef') return <Navigate to="/chef/dashboard" replace />;
     if (user.role === 'admin') return <Navigate to="/superadmin/dashboard" replace />;
     return <Navigate to="/" replace />;
   }

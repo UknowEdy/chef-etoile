@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navigation, Users, MapPin, Share2, Clock, TrendingUp } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
+import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle, Section } from '../../components';
 
 interface Route {
@@ -290,6 +291,7 @@ export default function ChefAdminDeliveryRoutes() {
           )}
         </div>
       </div>
+      <ChefBottomNav />
     </AppShell>
   );
 }

@@ -1,126 +1,182 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Star, MapPin, Phone, ChefHat } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { MessageCircle, Star, MapPin, Utensils, Zap } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
-import { PageTitle } from '../components';
-import { StorageService } from '../utils/storage';
+import { Section, EmptyState } from '../components';
+import { StorageService, ChefProfileData, ChefRatingStats, DayMenu } from '../utils/storage';
+
+const MAX_PLATS_AFFICHES = 3;
+
+interface MenuPreviewItem {
+  day: string;
+  time: 'Midi' | 'Soir';
+  dish: string;
+}
 
 export default function ChefProfile() {
-  const { slug } = useParams();
   const navigate = useNavigate();
+  const { slug } = useParams();
+  const [chef, setChef] = useState<ChefProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [menuPreview, setMenuPreview] = useState<MenuPreviewItem[]>([]);
   const [photo, setPhoto] = useState<string | null>(null);
-  const chefSlug = slug || 'kodjo';
-  
-  const chefsData: any = {
-    kodjo: { name: 'Chef Kodjo', quartier: 'Tokoin', phone: '+228 90 12 34 56', rating: 4.8, totalRatings: 127, subscribers: 24 },
-    anna: { name: 'Chef Anna', quartier: 'Bè', phone: '+228 90 23 45 67', rating: 4.9, totalRatings: 203, subscribers: 18 },
-    gloria: { name: 'Chef Gloria', quartier: 'Hèdzranawoé', phone: '+228 90 34 56 78', rating: 4.7, totalRatings: 89, subscribers: 31 },
-    yao: { name: 'Chef Yao', quartier: 'Adidogomé', phone: '+228 90 45 67 89', rating: 4.6, totalRatings: 156, subscribers: 15 },
-    ama: { name: 'Chef Ama', quartier: 'Nyékonakpoè', phone: '+228 90 56 78 90', rating: 4.5, totalRatings: 67, subscribers: 22 }
-  };
-  const chef = chefsData[chefSlug] || chefsData.kodjo;
+  const [ratingStats, setRatingStats] = useState<ChefRatingStats>({ average: 0, count: 0 });
+
+  const effectiveSlug = slug || StorageService.getChefBySlug('kodjo')?.slug || 'kodjo';
 
   useEffect(() => {
-    const stored = StorageService.getChefPhoto(chefSlug);
-    if (stored) setPhoto(stored);
-  }, [chefSlug]);
+    const profile = StorageService.getChefBySlug(effectiveSlug);
+    setChef(profile);
+
+    const storedPhoto = StorageService.getChefPhoto(effectiveSlug);
+    if (storedPhoto) setPhoto(storedPhoto);
+
+    if (profile) {
+      const fullMenu: DayMenu[] = StorageService.getMenu(profile.slug);
+      const stats = StorageService.getChefRatingStats(profile.slug);
+      setRatingStats(stats);
+      const preview = fullMenu
+        .filter((day) => !day.isAbsent && (day.midi || day.soir))
+        .flatMap((day) => [
+          { day: day.day, time: 'Midi' as const, dish: day.midi },
+          { day: day.day, time: 'Soir' as const, dish: day.soir }
+        ])
+        .filter((item) => item.dish && item.dish.trim().length > 0)
+        .slice(0, MAX_PLATS_AFFICHES);
+
+      setMenuPreview(preview);
+    }
+
+    setLoading(false);
+  }, [effectiveSlug]);
+
+  const deliveryStatus = useMemo(() => 'En cuisine 🧑‍🍳', []);
+
+  if (loading) {
+    return (
+      <AppShell>
+        <TopBar showLogo showBack />
+        <div className="page page-content">Chargement...</div>
+        <BottomNav />
+      </AppShell>
+    );
+  }
+
+  if (!chef) {
+    return (
+      <AppShell>
+        <TopBar showLogo showBack />
+        <div className="page page-content">
+          <EmptyState title="Chef introuvable" description="Ce chef n'est pas encore enregistré." />
+        </div>
+        <BottomNav />
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
-      <TopBar showLogo={true} showBack />
+      <TopBar showLogo showBack />
       <div className="page">
         <div className="page-content">
-          <PageTitle 
-            title={chef.name}
-            subtitle={chef.quartier}
-          />
-
-          <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+          <div className="profile-card" style={{ marginBottom: '24px' }}>
             <div
+              className="profile-avatar"
               style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '50%',
-                background: photo ? `url(${photo}) center/cover` : 'url(/images/chef-etoile-logo.png) center/cover',
-                border: '1px solid #E5E7EB'
+                width: '100px',
+                height: '100px',
+                fontSize: '40px',
+                background: photo ? `url(${photo}) center/cover` : undefined
               }}
-            />
-            <div style={{ fontSize: '13px', color: '#6B7280' }}>
-              Photo visible par vos clients. Mettez-la à jour dans vos Paramètres Chef★.
-            </div>
-          </div>
-          
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(3, 1fr)', 
-            gap: '12px',
-            marginBottom: '24px'
-          }}>
-            <div className="card" style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: '700', color: '#D4AF37' }}>
-                {chef.rating}
-              </div>
-              <div style={{ fontSize: '11px', color: '#6B7280' }}>
-                <Star size={12} style={{ display: 'inline', marginRight: '2px' }} />
-                Note
-              </div>
-            </div>
-            <div className="card" style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: '700', color: '#D4AF37' }}>
-                {chef.totalRatings}
-              </div>
-              <div style={{ fontSize: '11px', color: '#6B7280' }}>Avis</div>
-            </div>
-            <div className="card" style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: '700', color: '#D4AF37' }}>
-                {chef.subscribers}
-              </div>
-              <div style={{ fontSize: '11px', color: '#6B7280' }}>Abonnés</div>
-            </div>
-          </div>
-
-          <div className="card" style={{ marginBottom: '16px' }}>
-            <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px' }}>
-              Contact
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', marginBottom: '8px' }}>
-              <Phone size={16} color="#6B7280" />
-              {chef.phone}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
-              <MapPin size={16} color="#6B7280" />
-              {chef.quartier}, Lomé
-            </div>
-          </div>
-
-          <div className="card" style={{ marginBottom: '16px' }}>
-            <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px' }}>
-              Menu cette semaine
-            </div>
-            <div style={{ fontSize: '13px', color: '#6B7280', marginBottom: '12px' }}>
-              Lundi : Riz sauce arachide<br />
-              Mardi : Pâtes sauce tomate<br />
-              Mercredi : Fufu sauce gombo<br />
-              Jeudi : Attiéké poisson<br />
-              Vendredi : Riz gras
-            </div>
-            <button 
-              className="btn btn-secondary"
-              onClick={() => navigate(`/chefs/${slug}/menu`)}
             >
-              <ChefHat size={20} />
+              {!photo && '👨‍🍳'}
+            </div>
+            <h1 className="text-2xl font-bold mt-2">{chef.name}</h1>
+            <p className="text-sm text-gray-500 mt-1">{chef.bio}</p>
+
+            <div style={{ display: 'flex', gap: '15px', marginTop: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <span className="badge" style={{ backgroundColor: '#FBBF24', color: 'white' }}>
+                <Star size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                {ratingStats.average.toFixed(1)}/5 ({ratingStats.count} vote{ratingStats.count > 1 ? 's' : ''})
+              </span>
+              <span className="badge" style={{ backgroundColor: '#DBEAFE', color: '#1E40AF' }}>
+                <Utensils size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                {chef.cuisineType}
+              </span>
+            </div>
+
+            <div style={{ marginTop: '10px', fontSize: '14px', color: '#6B7280' }}>
+              <MapPin size={14} style={{ display: 'inline', marginRight: '4px' }} />
+              {chef.location}
+            </div>
+
+            <div style={{ borderTop: '1px solid #E5E7EB', paddingTop: '15px', marginTop: '15px', width: '100%', textAlign: 'center' }}>
+              <span style={{ fontWeight: '600', color: '#10B981', fontSize: '13px' }}>
+                <Zap size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                Statut actuel : {deliveryStatus}
+              </span>
+            </div>
+          </div>
+
+          <Section title="Aperçu du Menu">
+            <div className="card" style={{ padding: '16px', border: '1px solid #E5E7EB' }}>
+              {menuPreview.length > 0 ? (
+                menuPreview.map((item, index) => (
+                  <div
+                    key={`${item.day}-${item.time}-${index}`}
+                    style={{
+                      padding: '8px 0',
+                      borderBottom: index < menuPreview.length - 1 ? '1px solid #F3F4F6' : 'none',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: '14px'
+                    }}
+                  >
+                    <span style={{ fontWeight: '600' }}>{item.dish}</span>
+                    <span style={{ color: '#6B7280' }}>
+                      {item.day} ({item.time})
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500">Menu non disponible cette semaine.</p>
+              )}
+            </div>
+
+            <button
+              className="btn btn-secondary"
+              onClick={() => navigate(`/chefs/${chef.slug}/menu`)}
+              style={{ marginTop: '16px' }}
+            >
               Voir le menu complet
             </button>
-          </div>
+          </Section>
 
-          <button 
-            className="btn btn-primary"
-            onClick={() => navigate(`/chefs/${slug}/subscribe`)}
-          >
-            S'abonner à {chef.name}
-          </button>
+          <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+            <button
+              className="btn btn-whatsapp"
+              style={{ flex: 1 }}
+              onClick={() => {
+                const phoneClean = (chef.phone || '').replace(/\s/g, '');
+                const message = `Bonjour ${chef.name} !`;
+                if (phoneClean) {
+                  window.open(`https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`, '_blank');
+                }
+              }}
+            >
+              <MessageCircle size={20} />
+              Contacter le Chef
+            </button>
+            <button
+              className="btn btn-primary"
+              style={{ flex: 1 }}
+              onClick={() => navigate(`/chefs/${chef.slug}/subscribe`)}
+            >
+              S'abonner à {chef.name}
+            </button>
+          </div>
         </div>
       </div>
       <BottomNav />

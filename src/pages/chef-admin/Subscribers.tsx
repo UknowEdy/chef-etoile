@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Search, Filter, Phone, MessageCircle } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
+import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle, EmptyState } from '../../components';
 import { StorageService, Subscription } from '../../utils/storage';
 import { useAuth } from '../../context/AuthContext';
@@ -105,6 +106,7 @@ export default function ChefAdminSubscribers() {
           )}
         </div>
       </div>
+      <ChefBottomNav />
     </AppShell>
   );
 }

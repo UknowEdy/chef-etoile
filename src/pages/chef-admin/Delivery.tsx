@@ -3,6 +3,7 @@ import { MapPin, Phone, Clock, Check, Navigation, Map } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
+import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle } from '../../components';
 
 interface Delivery {
@@ -89,7 +90,7 @@ export default function ChefAdminDelivery() {
           {/* Bouton pour optimiser les tournées */}
           <button 
             className="btn btn-primary"
-            onClick={() => navigate('/chef-admin/delivery-routes')}
+            onClick={() => navigate('/chef/delivery-routes')}
             style={{ marginBottom: '24px' }}
           >
             <Navigation size={20} />
@@ -212,6 +213,7 @@ export default function ChefAdminDelivery() {
           </div>
         </div>
       </div>
+      <ChefBottomNav />
     </AppShell>
   );
 }

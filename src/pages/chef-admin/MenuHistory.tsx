@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
+import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle, WeekSelector, Section } from '../../components';
 
 export default function ChefAdminMenuHistory() {
@@ -27,6 +28,7 @@ export default function ChefAdminMenuHistory() {
           </Section>
         </div>
       </div>
+      <ChefBottomNav />
     </AppShell>
   );
 }

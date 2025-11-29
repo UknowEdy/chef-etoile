@@ -1,70 +1,90 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChefHat, Users, Settings, LogOut, Shield } from 'lucide-react';
+import { ChefHat, Users, Settings, LogOut, TrendingUp } from 'lucide-react';
 import AppShell from '../../components/AppShell';
-import { LogoFull } from '../../components/Logo';
+import TopBar from '../../components/TopBar';
+import { PageTitle, Section } from '../../components';
 import { useAuth } from '../../context/AuthContext';
+import { StorageService } from '../../utils/storage';
+import SuperAdminBottomNav from '../../components/SuperAdminBottomNav';
+
+interface GlobalKpi {
+  totalChefs: number;
+  totalSubscribers: number;
+  totalActiveMealsToday: number;
+}
 
 export default function SuperAdminDashboard() {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const stats = [
-    { label: 'Chefs★ actifs', value: '12' },
-    { label: 'Total abonnés', value: '248' },
-    { label: 'Repas/jour', value: '432' }
-  ];
+  const [kpi, setKpi] = useState<GlobalKpi>({
+    totalChefs: 0,
+    totalSubscribers: 0,
+    totalActiveMealsToday: 0
+  });
+
+  useEffect(() => {
+    const allChefs = StorageService.getAllChefs();
+    const allSubs = StorageService.getSubscriptions();
+
+    const totalChefs = allChefs.length;
+    const activeSubs = allSubs.filter((sub) => sub.status === 'active');
+    const uniqueSubscribers = new Set(activeSubs.map((sub) => sub.clientEmail)).size;
+
+    let totalMeals = 0;
+    activeSubs.forEach((sub) => {
+      totalMeals += sub.planId === 'complet' ? 2 : 1;
+    });
+
+    setKpi({
+      totalChefs,
+      totalSubscribers: uniqueSubscribers,
+      totalActiveMealsToday: totalMeals
+    });
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/superadmin/login');
+  };
 
   const menuItems = [
-    { icon: <ChefHat size={24} />, label: 'Gérer les Chefs★', path: '/superadmin/chefs' },
-    { icon: <Users size={24} />, label: 'Utilisateurs', path: '/superadmin/users' },
-    { icon: <Settings size={24} />, label: 'Configuration', path: '/superadmin/config' }
+    { icon: <ChefHat size={24} />, label: 'Gérer les Chefs', path: '/superadmin/chefs' },
+    { icon: <Users size={24} />, label: 'Gérer les Utilisateurs', path: '/superadmin/users' },
+    { icon: <Settings size={24} />, label: 'Configuration Système', path: '/superadmin/config' }
+  ];
+
+  const stats = [
+    { label: 'Chefs Actifs', value: kpi.totalChefs.toString(), color: '#111827' },
+    { label: 'Abonnés Uniques', value: kpi.totalSubscribers.toString(), color: '#6B7280' },
+    { label: 'Repas à Préparer (Total)', value: kpi.totalActiveMealsToday.toString(), color: '#6B7280' }
   ];
 
   return (
     <AppShell>
+      <TopBar title="SuperAdmin" />
       <div className="page">
         <div className="page-content">
-          {/* Logo complet */}
-          <div style={{ textAlign: 'center', padding: '16px 0' }}>
-            <LogoFull />
-          </div>
+          <PageTitle
+            title="Tableau de Bord Global"
+            subtitle="Vue d'ensemble et métriques de la plateforme"
+          />
 
-          <div style={{ 
-            fontSize: '24px', 
-            fontWeight: '700', 
-            marginBottom: '8px',
-            textAlign: 'center'
-          }}>
-            Administration
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 12px', borderRadius: '12px', border: '1px solid #111827', color: '#111827', fontWeight: 600 }}>
-              <Shield size={16} />
-              Zone SuperAdmin
-            </span>
-          </div>
-          <div style={{ 
-            fontSize: '14px', 
-            color: '#6B7280',
-            marginBottom: '32px',
-            textAlign: 'center'
-          }}>
-            Gérez la plateforme Chef★
-          </div>
-
-          {/* Stats */}
-          <div style={{ marginBottom: '32px' }}>
-            <h2 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>
-              Statistiques globales
-            </h2>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(3, 1fr)', 
-              gap: '12px' 
-            }}>
-              {stats.map((stat) => (
-                <div key={stat.label} className="card" style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '28px', fontWeight: '700', color: '#111827' }}>
+          <Section title="Métricas Clés">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
+              {stats.map((stat, index) => (
+                <div
+                  key={index}
+                  style={{
+                    background: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '16px',
+                    padding: '16px',
+                    textAlign: 'center'
+                  }}
+                >
+                  <div style={{ fontSize: '24px', fontWeight: '700', color: stat.color, marginBottom: '4px' }}>
                     {stat.value}
                   </div>
                   <div style={{ fontSize: '12px', color: '#6B7280' }}>
@@ -73,52 +93,57 @@ export default function SuperAdminDashboard() {
                 </div>
               ))}
             </div>
-          </div>
+          </Section>
 
-          {/* Menu */}
-          <div style={{ marginBottom: '32px' }}>
-            <h2 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>
-              Gestion
-            </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {menuItems.map((item) => (
-                <button
-                  key={item.path}
-                  className="card"
-                  onClick={() => navigate(item.path)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '16px',
-                    border: '1px solid #E5E7EB',
-                    background: 'white',
-                    cursor: 'pointer',
-                    textAlign: 'left'
-                  }}
-                >
-                  {item.icon}
-                  <span style={{ fontSize: '15px', fontWeight: '500' }}>
-                    {item.label}
-                  </span>
-                </button>
-              ))}
+          <Section title="Statistiques Clés">
+            <div className="card" style={{ padding: '16px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>Tendances de la Plateforme</h3>
+              <p style={{ fontSize: '14px', color: '#6B7280', display: 'flex', alignItems: 'center' }}>
+                <TrendingUp size={18} color="#10B981" style={{ marginRight: '8px' }} />
+                Le nombre d'abonnements a augmenté de 5% ce mois-ci.
+              </p>
             </div>
-          </div>
+          </Section>
 
-          {/* Déconnexion */}
-          <button 
+          <Section title="Navigation Administrative">
+            {menuItems.map((item, index) => (
+              <button
+                key={index}
+                className="card"
+                onClick={() => navigate(item.path)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px',
+                  cursor: 'pointer',
+                  border: '1px solid #E5E7EB',
+                  background: '#FFFFFF',
+                  textAlign: 'left',
+                  width: '100%',
+                  marginBottom: '12px'
+                }}
+              >
+                <div style={{ color: '#111827' }}>
+                  {item.icon}
+                </div>
+                <div style={{ flex: 1, fontSize: '15px', fontWeight: 600 }}>
+                  {item.label}
+                </div>
+              </button>
+            ))}
+          </Section>
+
+          <button
             className="btn btn-secondary"
-            onClick={() => {
-              logout();
-              navigate('/superadmin/login');
-            }}
+            onClick={handleLogout}
+            style={{ backgroundColor: '#DC2626', color: 'white', borderColor: '#DC2626' }}
           >
             <LogOut size={20} />
-            Se déconnecter
+            Se déconnecter (SuperAdmin)
           </button>
         </div>
       </div>
+      <SuperAdminBottomNav />
     </AppShell>
   );
 }

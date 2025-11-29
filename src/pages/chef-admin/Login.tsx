@@ -20,7 +20,7 @@ export default function ChefAdminLogin() {
     if (email === 'chef@test.com' && password === '123') {
       chefSlug = 'kodjo';
       login('chef', email, chefSlug);
-      navigate('/chef-admin/dashboard');
+      navigate('/chef/dashboard');
     } else {
       setError('Email ou mot de passe incorrect.');
     }
@@ -28,7 +28,7 @@ export default function ChefAdminLogin() {
 
   return (
     <AppShell>
-      <TopBar title="Espace Chef★" showBack />
+      <TopBar title="Connexion Chef★" showBack />
       <div className="page">
         <div className="page-content">
           <div style={{ textAlign: 'center', padding: '48px 0 32px' }}>

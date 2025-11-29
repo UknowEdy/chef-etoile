@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Upload, Trash2, Edit2, Save, X } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
+import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle } from '../../components';
 
 interface Plat {
@@ -243,6 +244,7 @@ export default function ChefAdminMenuGallery() {
           )}
         </div>
       </div>
+      <ChefBottomNav />
     </AppShell>
   );
 }

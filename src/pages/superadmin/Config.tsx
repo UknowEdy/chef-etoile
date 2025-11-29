@@ -3,6 +3,7 @@ import { Save } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
 import { PageTitle, Section } from '../../components';
+import SuperAdminBottomNav from '../../components/SuperAdminBottomNav';
 
 export default function SuperAdminConfig() {
   const [isEditingTarifs, setIsEditingTarifs] = useState(false);
@@ -154,6 +155,7 @@ export default function SuperAdminConfig() {
           </Section>
         </div>
       </div>
+      <SuperAdminBottomNav />
     </AppShell>
   );
 }

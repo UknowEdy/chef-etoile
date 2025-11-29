@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
 import { PageTitle, Section } from '../../components';
+import SuperAdminBottomNav from '../../components/SuperAdminBottomNav';
 
 export default function SuperAdminNewChef() {
   const navigate = useNavigate();
@@ -139,6 +140,7 @@ export default function SuperAdminNewChef() {
           </form>
         </div>
       </div>
+      <SuperAdminBottomNav />
     </AppShell>
   );
 }

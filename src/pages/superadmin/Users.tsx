@@ -1,6 +1,7 @@
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
 import { PageTitle } from '../../components';
+import SuperAdminBottomNav from '../../components/SuperAdminBottomNav';
 
 export default function SuperAdminUsers() {
   const users = [
@@ -41,6 +42,7 @@ export default function SuperAdminUsers() {
           </div>
         </div>
       </div>
+      <SuperAdminBottomNav />
     </AppShell>
   );
 }

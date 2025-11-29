@@ -7,27 +7,27 @@ export default function ChefBottomNav() {
 
   return (
     <div className="bottom-nav">
-      <Link to="/chef-admin/dashboard" className={`bottom-nav-item ${isActive('/chef-admin/dashboard') ? 'bottom-nav-item-active' : ''}`}>
+      <Link to="/chef/dashboard" className={`bottom-nav-item ${isActive('/chef/dashboard') ? 'bottom-nav-item-active' : ''}`}>
         <Home size={22} />
         <span>Accueil</span>
       </Link>
 
-      <Link to="/chef-admin/orders" className={`bottom-nav-item ${isActive('/chef-admin/orders') ? 'bottom-nav-item-active' : ''}`}>
+      <Link to="/chef/orders" className={`bottom-nav-item ${isActive('/chef/orders') ? 'bottom-nav-item-active' : ''}`}>
         <ClipboardList size={22} />
         <span>Commandes</span>
       </Link>
 
-      <Link to="/chef-admin/subscribers" className={`bottom-nav-item ${isActive('/chef-admin/subscribers') ? 'bottom-nav-item-active' : ''}`}>
+      <Link to="/chef/subscribers" className={`bottom-nav-item ${isActive('/chef/subscribers') ? 'bottom-nav-item-active' : ''}`}>
         <Users size={22} />
         <span>Abonnés</span>
       </Link>
 
-      <Link to="/chef-admin/menu" className={`bottom-nav-item ${isActive('/chef-admin/menu') ? 'bottom-nav-item-active' : ''}`}>
+      <Link to="/chef/menu" className={`bottom-nav-item ${isActive('/chef/menu') ? 'bottom-nav-item-active' : ''}`}>
         <UtensilsCrossed size={22} />
         <span>Menu</span>
       </Link>
 
-      <Link to="/chef-admin/settings" className={`bottom-nav-item ${isActive('/chef-admin/settings') ? 'bottom-nav-item-active' : ''}`}>
+      <Link to="/chef/settings" className={`bottom-nav-item ${isActive('/chef/settings') ? 'bottom-nav-item-active' : ''}`}>
         <Settings size={22} />
         <span>Réglages</span>
       </Link>
