@@ -1,36 +1,42 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Users, ClipboardList, UtensilsCrossed, Settings } from 'lucide-react';
 
+const ACTIVE_COLOR = '#D4AF37';
+const INACTIVE_COLOR = '#6B7280';
+
+const navItems = [
+  { path: '/chef/dashboard', label: 'Accueil', icon: Home },
+  { path: '/chef/orders', label: 'Commandes', icon: ClipboardList },
+  { path: '/chef/subscribers', label: 'Abonnés', icon: Users },
+  { path: '/chef/menu', label: 'Menu', icon: UtensilsCrossed },
+  { path: '/chef/settings', label: 'Réglages', icon: Settings }
+];
+
 export default function ChefBottomNav() {
   const { pathname } = useLocation();
-  const isActive = (path: string) => pathname === path;
+
+  const isActive = (path: string) => {
+    if (path === '/chef/dashboard') return pathname === '/chef/dashboard';
+    return pathname.startsWith(path);
+  };
 
   return (
     <div className="bottom-nav">
-      <Link to="/chef/dashboard" className={`bottom-nav-item ${isActive('/chef/dashboard') ? 'bottom-nav-item-active' : ''}`}>
-        <Home size={22} />
-        <span>Accueil</span>
-      </Link>
-
-      <Link to="/chef/orders" className={`bottom-nav-item ${isActive('/chef/orders') ? 'bottom-nav-item-active' : ''}`}>
-        <ClipboardList size={22} />
-        <span>Commandes</span>
-      </Link>
-
-      <Link to="/chef/subscribers" className={`bottom-nav-item ${isActive('/chef/subscribers') ? 'bottom-nav-item-active' : ''}`}>
-        <Users size={22} />
-        <span>Abonnés</span>
-      </Link>
-
-      <Link to="/chef/menu" className={`bottom-nav-item ${isActive('/chef/menu') ? 'bottom-nav-item-active' : ''}`}>
-        <UtensilsCrossed size={22} />
-        <span>Menu</span>
-      </Link>
-
-      <Link to="/chef/settings" className={`bottom-nav-item ${isActive('/chef/settings') ? 'bottom-nav-item-active' : ''}`}>
-        <Settings size={22} />
-        <span>Réglages</span>
-      </Link>
+      {navItems.map(({ path, label, icon: Icon }) => {
+        const active = isActive(path);
+        const color = active ? ACTIVE_COLOR : INACTIVE_COLOR;
+        return (
+          <Link
+            key={path}
+            to={path}
+            className={`bottom-nav-item ${active ? 'bottom-nav-item-active' : ''}`}
+            style={{ color }}
+          >
+            <Icon size={22} strokeWidth={active ? 2.5 : 2} />
+            <span style={{ fontWeight: active ? 700 : 500 }}>{label}</span>
+          </Link>
+        );
+      })}
     </div>
   );
 }

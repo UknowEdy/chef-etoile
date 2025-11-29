@@ -134,11 +134,19 @@ body {
   color: var(--gold);
 }
 
+.bottom-nav-item-active {
+  color: var(--gold);
+}
+
 .bottom-nav-item svg {
   transition: color 0.2s;
 }
 
 .bottom-nav-item.active svg {
+  color: var(--gold);
+}
+
+.bottom-nav-item-active svg {
   color: var(--gold);
 }
 

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { MessageCircle, Star, MapPin, Utensils, Zap } from 'lucide-react';
+import { MessageCircle, Star, MapPin, Utensils, Zap, Calendar } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 import { Section, EmptyState } from '../components';
-import { StorageService, ChefProfileData, ChefRatingStats, DayMenu } from '../utils/storage';
+import { StorageService, ChefProfileData, ChefRatingStats, DayMenu, ChefPlan } from '../utils/storage';
 
 const MAX_PLATS_AFFICHES = 3;
 
@@ -23,6 +23,7 @@ export default function ChefProfile() {
   const [menuPreview, setMenuPreview] = useState<MenuPreviewItem[]>([]);
   const [photo, setPhoto] = useState<string | null>(null);
   const [ratingStats, setRatingStats] = useState<ChefRatingStats>({ average: 0, count: 0 });
+  const [plans, setPlans] = useState<ChefPlan[]>([]);
 
   const effectiveSlug = slug || StorageService.getChefBySlug('kodjo')?.slug || 'kodjo';
 
@@ -37,6 +38,7 @@ export default function ChefProfile() {
       const fullMenu: DayMenu[] = StorageService.getMenu(profile.slug);
       const stats = StorageService.getChefRatingStats(profile.slug);
       setRatingStats(stats);
+      setPlans(StorageService.getChefPlans(profile.slug).filter((p) => p.active));
       const preview = fullMenu
         .filter((day) => !day.isAbsent && (day.midi || day.soir))
         .flatMap((day) => [
@@ -119,6 +121,24 @@ export default function ChefProfile() {
               </span>
             </div>
           </div>
+
+          <Section title="Formules disponibles">
+            <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {plans.length === 0 && <div style={{ fontSize: '13px', color: '#6B7280' }}>Aucune formule active.</div>}
+              {plans.map((plan) => (
+                <div key={plan.id} style={{ borderBottom: '1px solid #E5E7EB', paddingBottom: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '15px', fontWeight: 700 }}>{plan.name}</div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#D4AF37' }}>{plan.price} F</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#6B7280' }}>
+                    <Calendar size={14} />
+                    Jours : {plan.days.join(', ')}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
 
           <Section title="Aperçu du Menu">
             <div className="card" style={{ padding: '16px', border: '1px solid #E5E7EB' }}>

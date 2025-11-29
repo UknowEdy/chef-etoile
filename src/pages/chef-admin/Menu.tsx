@@ -1,39 +1,35 @@
 import { useState, useEffect } from 'react';
-import { Save, Calendar, Utensils, XCircle } from 'lucide-react';
+import { Save, Calendar, Utensils } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
 import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle, Section, EmptyState } from '../../components';
 import { useAuth } from '../../context/AuthContext';
-import { StorageService, DayMenu } from '../../utils/storage';
+import { StorageService, DayMenu, ChefPlan } from '../../utils/storage';
 
 export default function ChefAdminMenu() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const chefSlug = user?.chefSlug || 'kodjo';
+  const [plans, setPlans] = useState<ChefPlan[]>([]);
   const [menuData, setMenuData] = useState<DayMenu[]>([]);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   useEffect(() => {
-    if (chefSlug) {
-      setMenuData(StorageService.getMenu(chefSlug));
-    }
+    if (!chefSlug) return;
+    setPlans(StorageService.getChefPlans(chefSlug));
+    setMenuData(StorageService.getMenu(chefSlug));
   }, [chefSlug]);
 
+  const allowMidi = plans.some((p) => p.active && (p.id === 'midi' || p.id === 'complet'));
+  const allowSoir = plans.some((p) => p.active && (p.id === 'soir' || p.id === 'complet'));
+
   const handleDishChange = (dayIndex: number, mealType: 'midi' | 'soir', value: string) => {
+    if ((mealType === 'midi' && !allowMidi) || (mealType === 'soir' && !allowSoir)) return;
     setMenuData((prev) =>
       prev.map((item, index) =>
         index === dayIndex ? { ...item, [mealType]: value } : item
-      )
-    );
-    setSaveStatus('idle');
-  };
-
-  const handleAbsentToggle = (dayIndex: number) => {
-    setMenuData((prev) =>
-      prev.map((item, index) =>
-        index === dayIndex ? { ...item, isAbsent: !item.isAbsent } : item
       )
     );
     setSaveStatus('idle');
@@ -91,41 +87,66 @@ export default function ChefAdminMenu() {
                 description="Commencez par remplir vos plats du midi et du soir."
               />
             ) : (
-              menuData.map((dayItem, index) => (
-                <div key={dayItem.day} className="card" style={{ marginBottom: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <h3 style={{ fontSize: '16px', fontWeight: '700', color: dayItem.isAbsent ? '#EF4444' : '#111827' }}>
-                      <Calendar size={16} style={{ display: 'inline', marginRight: '8px' }} />
-                      {dayItem.day}
-                    </h3>
-                    <button
-                      onClick={() => handleAbsentToggle(index)}
-                      style={{ background: 'none', border: '1px solid #E5E7EB', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', color: dayItem.isAbsent ? '#EF4444' : '#4B5563' }}
-                    >
-                      {dayItem.isAbsent ? <XCircle size={14} style={{ display: 'inline', marginRight: '4px' }} /> : null}
-                      {dayItem.isAbsent ? 'Jour OFF' : 'Mettre en OFF'}
-                    </button>
-                  </div>
+              menuData
+                .map((dayItem, index) => {
+                  const dayName = dayItem.day.toLowerCase();
+                  const midiAllowed =
+                    allowMidi &&
+                    plans.some(
+                      (p) =>
+                        p.active &&
+                        (p.id === 'midi' || p.id === 'complet') &&
+                        p.days.map((d) => d.toLowerCase()).includes(dayName)
+                    );
+                  const soirAllowed =
+                    allowSoir &&
+                    plans.some(
+                      (p) =>
+                        p.active &&
+                        (p.id === 'soir' || p.id === 'complet') &&
+                        p.days.map((d) => d.toLowerCase()).includes(dayName)
+                    );
 
-                  <div style={{ opacity: dayItem.isAbsent ? 0.4 : 1, pointerEvents: dayItem.isAbsent ? 'none' : 'auto' }}>
-                    <label className="label">Midi</label>
-                    <input
-                      className="input"
-                      value={dayItem.midi}
-                      onChange={(e) => handleDishChange(index, 'midi', e.target.value)}
-                      placeholder="Ex: Riz sauce arachide"
-                    />
+                  if (!midiAllowed && !soirAllowed) return null;
 
-                    <label className="label">Soir</label>
-                    <input
-                      className="input"
-                      value={dayItem.soir}
-                      onChange={(e) => handleDishChange(index, 'soir', e.target.value)}
-                      placeholder="Ex: Attiéké poisson braisé"
-                    />
-                  </div>
-                </div>
-              ))
+                  return (
+                    <div key={dayItem.day} className="card" style={{ marginBottom: '16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <h3 style={{ fontSize: '16px', fontWeight: '700' }}>
+                          <Calendar size={16} style={{ display: 'inline', marginRight: '8px' }} />
+                          {dayItem.day}
+                        </h3>
+                      </div>
+
+                      <div>
+                        {midiAllowed && (
+                          <>
+                            <label className="label">Midi</label>
+                            <input
+                              className="input"
+                              value={dayItem.midi}
+                              onChange={(e) => handleDishChange(index, 'midi', e.target.value)}
+                              placeholder="Ex: Riz sauce arachide"
+                            />
+                          </>
+                        )}
+
+                        {soirAllowed && (
+                          <>
+                            <label className="label">Soir</label>
+                            <input
+                              className="input"
+                              value={dayItem.soir}
+                              onChange={(e) => handleDishChange(index, 'soir', e.target.value)}
+                              placeholder="Ex: Attiéké poisson braisé"
+                            />
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+                .filter(Boolean)
             )}
           </Section>
 

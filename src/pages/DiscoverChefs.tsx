@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Star, Users } from 'lucide-react';
+import { MapPin, Star, Users, Filter } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
 import { PageTitle } from '../components';
@@ -16,125 +16,127 @@ interface Chef {
   rating: number;
   totalRatings: number;
   subscribers: number;
-  rankingScore: number;
 }
+
+const MOCK_CHEFS_DATA: Chef[] = [
+  { 
+    id: '1', 
+    name: 'Chef Kodjo', 
+    slug: 'kodjo',
+    quartier: 'Tokoin', 
+    distance: 2.3,
+    rating: 4.8,
+    totalRatings: 127,
+    subscribers: 24
+  },
+  { 
+    id: '2', 
+    name: 'Chef Anna', 
+    slug: 'anna',
+    quartier: 'Bè', 
+    distance: 4.1,
+    rating: 4.9,
+    totalRatings: 203,
+    subscribers: 18
+  },
+  { 
+    id: '3', 
+    name: 'Chef Gloria', 
+    slug: 'gloria',
+    quartier: 'Hèdzranawoé', 
+    distance: 5.8,
+    rating: 4.7,
+    totalRatings: 89,
+    subscribers: 31
+  },
+  { 
+    id: '4', 
+    name: 'Chef Yao', 
+    slug: 'yao',
+    quartier: 'Adidogomé', 
+    distance: 7.2,
+    rating: 4.6,
+    totalRatings: 156,
+    subscribers: 15
+  },
+  { 
+    id: '5', 
+    name: 'Chef Ama', 
+    slug: 'ama',
+    quartier: 'Nyékonakpoè', 
+    distance: 8.5,
+    rating: 4.5,
+    totalRatings: 67,
+    subscribers: 22
+  },
+  { 
+    id: '6', 
+    name: 'Chef Pierre', 
+    slug: 'pierre',
+    quartier: 'Agoè', 
+    distance: 12.5,
+    rating: 4.4,
+    totalRatings: 45,
+    subscribers: 10
+  },
+  { 
+    id: '7', 
+    name: 'Chef Sarah', 
+    slug: 'sarah',
+    quartier: 'Baguida', 
+    distance: 18.2,
+    rating: 4.9,
+    totalRatings: 12,
+    subscribers: 5
+  }
+];
 
 export default function DiscoverChefs() {
   const navigate = useNavigate();
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
-  const [chefs, setChefs] = useState<Chef[]>([]);
   const [loading, setLoading] = useState(true);
   const [photos, setPhotos] = useState<Record<string, string>>({});
+  const [searchRadius, setSearchRadius] = useState<number>(20);
 
   useEffect(() => {
-    getUserLocationAndChefs();
+    getUserLocationAndPhotos();
   }, []);
 
-  const getUserLocationAndChefs = async () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const location = {
-            lat: position.coords.latitude,
-            lon: position.coords.longitude
-          };
-          setUserLocation(location);
-          loadNearbyChefs(location);
-        },
-        (error) => {
-          console.error('Erreur géolocalisation:', error);
-          loadNearbyChefs(null);
-        }
-      );
-    } else {
-      loadNearbyChefs(null);
-    }
-  };
-
-  const loadNearbyChefs = (location: { lat: number; lon: number } | null) => {
-    // Données de test (à remplacer par API)
-    const mockChefs: Chef[] = [
-      { 
-        id: '1', 
-        name: 'Chef Kodjo', 
-        slug: 'kodjo',
-        quartier: 'Tokoin', 
-        distance: 2.3,
-        rating: 4.8,
-        totalRatings: 127,
-        subscribers: 24,
-        rankingScore: 0
-      },
-      { 
-        id: '2', 
-        name: 'Chef Anna', 
-        slug: 'anna',
-        quartier: 'Bè', 
-        distance: 4.1,
-        rating: 4.9,
-        totalRatings: 203,
-        subscribers: 18,
-        rankingScore: 0
-      },
-      { 
-        id: '3', 
-        name: 'Chef Gloria', 
-        slug: 'gloria',
-        quartier: 'Hèdzranawoé', 
-        distance: 5.8,
-        rating: 4.7,
-        totalRatings: 89,
-        subscribers: 31,
-        rankingScore: 0
-      },
-      { 
-        id: '4', 
-        name: 'Chef Yao', 
-        slug: 'yao',
-        quartier: 'Adidogomé', 
-        distance: 7.2,
-        rating: 4.6,
-        totalRatings: 156,
-        subscribers: 15,
-        rankingScore: 0
-      },
-      { 
-        id: '5', 
-        name: 'Chef Ama', 
-        slug: 'ama',
-        quartier: 'Nyékonakpoè', 
-        distance: 8.5,
-        rating: 4.5,
-        totalRatings: 67,
-        subscribers: 22,
-        rankingScore: 0
-      }
-    ];
-
-    // ALGORITHME DE RANKING
-    // Score = (Rating × 30%) + (TotalRatings × 0.01 × 30%) + (Subscribers × 0.1 × 20%) - (Distance × 2%)
-    const rankedChefs = mockChefs
-      .filter(chef => chef.distance <= 15)
-      .map(chef => ({
-        ...chef,
-        rankingScore: 
-          chef.rating * 0.30 +
-          chef.totalRatings * 0.01 * 0.30 +
-          chef.subscribers * 0.1 * 0.20 -
-          chef.distance * 0.02
-      }))
-      .sort((a, b) => b.rankingScore - a.rankingScore)
-      .slice(0, 5);
-
-    setChefs(rankedChefs);
+  const getUserLocationAndPhotos = async () => {
     const photoMap: Record<string, string> = {};
-    rankedChefs.forEach((chef) => {
+    MOCK_CHEFS_DATA.forEach((chef) => {
       const stored = StorageService.getChefPhoto(chef.slug);
       if (stored) photoMap[chef.slug] = stored;
     });
     setPhotos(photoMap);
-    setLoading(false);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+          });
+          setLoading(false);
+        },
+        (error) => {
+          console.error('Erreur géolocalisation:', error);
+          setLoading(false);
+        }
+      );
+    } else {
+      setLoading(false);
+    }
   };
+
+  const filteredChefs = useMemo(() => {
+    return MOCK_CHEFS_DATA
+      .filter((chef) => chef.distance <= searchRadius)
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 5);
+  }, [searchRadius]);
+
+  const radiusOptions = [5, 10, 15, 20];
 
   return (
     <AppShell>
@@ -146,6 +148,43 @@ export default function DiscoverChefs() {
             subtitle="Les meilleurs chefs près de chez vous"
           />
 
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px', 
+              marginBottom: '12px',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151'
+            }}>
+              <Filter size={16} />
+              Rayon de recherche :
+            </div>
+            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+              {radiusOptions.map((km) => (
+                <button
+                  key={km}
+                  onClick={() => setSearchRadius(km)}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '20px',
+                    border: 'none',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    backgroundColor: searchRadius === km ? '#D4AF37' : '#E5E7EB',
+                    color: searchRadius === km ? 'white' : '#4B5563',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {km} km
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Info ranking */}
           <div style={{
             padding: '12px',
@@ -155,7 +194,7 @@ export default function DiscoverChefs() {
             fontSize: '13px',
             color: '#92400E'
           }}>
-            ⭐ <strong>Top 5 uniquement</strong> - Classés par note, nombre d'avis et proximité
+            ⭐ <strong>Top 5</strong> des chefs classés par note et proximité à moins de <strong>{searchRadius} km</strong>
           </div>
 
           {loading ? (
@@ -164,7 +203,7 @@ export default function DiscoverChefs() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {chefs.map((chef, index) => (
+              {filteredChefs.map((chef, index) => (
                 <div 
                   key={chef.id}
                   className="card"

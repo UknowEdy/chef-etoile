@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 import { PageTitle, Section, SubscriptionCard } from '../components';
-import { StorageService } from '../utils/storage';
+import { StorageService, ChefPlan } from '../utils/storage';
 import { useAuth } from '../context/AuthContext';
 
 export default function Subscribe() {
@@ -14,100 +14,38 @@ export default function Subscribe() {
   const [selectedPlan, setSelectedPlan] = useState<string>('');
   const { user } = useAuth();
   const clientEmail = user?.email || 'unknown@client.com';
+  const chefSlug = slug || 'kodjo';
 
-  // Données personnalisées par chef
-  const chefsData: any = {
-    kodjo: { 
-      name: 'Chef Kodjo', 
-      phone: '+228 90 12 34 56',
-      jours: 'lundi au samedi',
-      nbJours: 6,
-      plans: [
-        { id: 'midi', name: 'Formule Midi', price: '7 500 F', repas: 6 },
-        { id: 'soir', name: 'Formule Soir', price: '7 500 F', repas: 6 },
-        { id: 'complet', name: 'Formule Complète', price: '14 000 F', repas: 12 }
-      ]
-    },
-    anna: { 
-      name: 'Chef Anna', 
-      phone: '+228 90 23 45 67',
-      jours: 'lundi au vendredi',
-      nbJours: 5,
-      plans: [
-        { id: 'midi', name: 'Formule Midi', price: '6 500 F', repas: 5 },
-        { id: 'soir', name: 'Formule Soir', price: '6 500 F', repas: 5 },
-        { id: 'complet', name: 'Formule Complète', price: '12 000 F', repas: 10 }
-      ]
-    },
-    gloria: { 
-      name: 'Chef Gloria', 
-      phone: '+228 90 34 56 78',
-      jours: 'lundi, mercredi et vendredi',
-      nbJours: 3,
-      plans: [
-        { id: 'midi', name: 'Formule Midi', price: '4 000 F', repas: 3 },
-        { id: 'soir', name: 'Formule Soir', price: '4 000 F', repas: 3 },
-        { id: 'complet', name: 'Formule Complète', price: '7 500 F', repas: 6 }
-      ]
-    },
-    yao: { 
-      name: 'Chef Yao', 
-      phone: '+228 90 45 67 89',
-      jours: 'lundi au samedi',
-      nbJours: 6,
-      plans: [
-        { id: 'midi', name: 'Formule Midi', price: '8 000 F', repas: 6 },
-        { id: 'soir', name: 'Formule Soir', price: '8 000 F', repas: 6 },
-        { id: 'complet', name: 'Formule Complète', price: '15 000 F', repas: 12 }
-      ]
-    },
-    ama: { 
-      name: 'Chef Ama', 
-      phone: '+228 90 56 78 90',
-      jours: 'lundi au vendredi',
-      nbJours: 5,
-      plans: [
-        { id: 'midi', name: 'Formule Midi', price: '7 000 F', repas: 5 },
-        { id: 'soir', name: 'Formule Soir', price: '7 000 F', repas: 5 },
-        { id: 'complet', name: 'Formule Complète', price: '13 000 F', repas: 10 }
-      ]
-    }
-  };
-
-  const chef = chefsData[slug || 'kodjo'] || chefsData.kodjo;
+  const chefProfile = StorageService.getChefBySlug(chefSlug) || { name: 'Chef★', phone: '+228 90 00 00 00', location: '' };
+  const plans: ChefPlan[] = useMemo(() => StorageService.getChefPlans(chefSlug), [chefSlug]);
 
   const handleSubscribe = () => {
-    const plan = chef.plans.find((p: any) => p.id === selectedPlan);
+    const plan = plans.find((p) => p.id === selectedPlan && p.active);
     if (!plan || !user) return;
 
-    // 1. Sauvegarder dans le stockage local
-    StorageService.addSubscription({
+    StorageService.requestSubscription({
       clientEmail,
-      chefSlug: slug || 'kodjo',
-      chefName: chef.name,
+      chefSlug,
+      chefName: chefProfile.name,
       planId: plan.id,
       planName: plan.name,
-      price: plan.price
+      price: plan.price,
+      days: plan.days,
+      clientPhone: ''
     });
-    
-    // 2. Préparer le message WhatsApp
-    const message = `Bonjour ${chef.name} !
 
-Je souhaite m'abonner à votre service :
+    const message = `Bonjour ${chefProfile.name} !
 
-📋 *Formule choisie :* ${plan.name}
-💰 *Montant :* ${plan.price}/semaine
-📅 *Jours de livraison :* ${chef.jours}
-🍽️ *Nombre de repas :* ${plan.repas} repas/semaine
+Je souhaite m'abonner à la formule *${plan.name}* pour les jours : ${plan.days.join(', ')}.
+Merci de confirmer pour que je puisse vous envoyer la preuve de paiement.`;
 
-Je confirme mon inscription et je vous enverrai mon transfert avec la preuve ici sur WhatsApp.`;
-
-    const phoneClean = chef.phone.replace(/\s/g, '');
-    
-    // 3. Ouvrir WhatsApp
+    const phoneClean = (chefProfile.phone || '').replace(/\s/g, '');
+    if (!phoneClean) {
+      alert("Numéro WhatsApp du chef indisponible. Merci de contacter le support.");
+      return;
+    }
     window.open(`https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`, '_blank');
 
-    // 4. Rediriger l'utilisateur vers "Mes abonnements"
     navigate('/my/subscriptions');
   };
 
@@ -122,12 +60,12 @@ Je confirme mon inscription et je vous enverrai mon transfert avec la preuve ici
           />
           
           <Section>
-            {chef.plans.map((plan: any) => (
+            {plans.filter((p) => p.active).map((plan) => (
               <SubscriptionCard
                 key={plan.id}
                 name={plan.name}
-                price={plan.price}
-                description={`Repas du ${plan.id} du ${chef.jours} (${plan.repas} repas)`}
+                price={`${plan.price} F`}
+                description={`Jours : ${plan.days.join(', ')}`}
                 selected={selectedPlan === plan.id}
                 onClick={() => setSelectedPlan(plan.id)}
               />
@@ -140,7 +78,7 @@ Je confirme mon inscription et je vous enverrai mon transfert avec la preuve ici
                 • Abonnement hebdomadaire renouvelable<br/>
                 • Paiement par Mobile Money avant activation<br/>
                 • Livraison incluse dans un rayon de 10 km<br/>
-                • Jours de livraison : {chef.jours}<br/>
+                • Jours de livraison selon votre choix de formule<br/>
                 • Preuve de transfert à envoyer sur WhatsApp
               </div>
             </div>
@@ -148,7 +86,7 @@ Je confirme mon inscription et je vous enverrai mon transfert avec la preuve ici
 
           <button 
             className="btn btn-whatsapp"
-            disabled={!selectedPlan}
+            disabled={!selectedPlan || !(chefProfile.phone)}
             onClick={handleSubscribe}
             style={{ opacity: selectedPlan ? 1 : 0.5 }}
           >

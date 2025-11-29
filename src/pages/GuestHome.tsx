@@ -15,7 +15,18 @@ export default function GuestHome() {
   return (
     <div className="home-guest-container">
       <div className="home-logo-section">
-        <img src="/images/chef-etoile-logo.png" alt="Chef★" className="home-logo-img" />
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+          <div
+            style={{
+              width: '110px',
+              height: '110px',
+              borderRadius: '999px',
+              border: '2px solid #D4AF37',
+              background: 'url(/images/chef-etoile-logo.png) center/70% no-repeat, #FFF9E6',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+            }}
+          />
+        </div>
         <p className="home-subtitle">Abonnez-vous aux meilleurs chefs de votre quartier</p>
       </div>
 

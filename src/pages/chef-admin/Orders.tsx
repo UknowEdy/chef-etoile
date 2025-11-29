@@ -1,22 +1,11 @@
 import { useEffect, useState, useMemo } from 'react';
-import { CheckCircle, Clock, Utensils, Printer } from 'lucide-react';
+import { CheckCircle, Clock, Utensils, Printer, Users } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
 import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle, Section, EmptyState } from '../../components';
-import { StorageService } from '../../utils/storage';
+import { StorageService, Subscription } from '../../utils/storage';
 import { useAuth } from '../../context/AuthContext';
-
-const mockMenus: Record<string, { midi: string; soir: string }> = {
-  kodjo: {
-    midi: 'Riz sauce arachide',
-    soir: 'Attiéké poisson braisé'
-  },
-  anna: {
-    midi: 'Pâtes bolognaise',
-    soir: 'Salade composée'
-  }
-};
 
 interface DishQuantity {
   dish: string;
@@ -24,23 +13,22 @@ interface DishQuantity {
   moment: 'midi' | 'soir';
 }
 
-const groupDishesByQuantity = (mySubs: any[], currentChefSlug: string): DishQuantity[] => {
+interface ClientMeal {
+  clientEmail: string;
+  dish: string;
+}
+
+const groupDishesByQuantity = (todayMeals: { midi: ClientMeal[]; soir: ClientMeal[] }): DishQuantity[] => {
   const dishCounts: Record<string, { midi: number; soir: number }> = {};
 
-  mySubs.forEach((sub) => {
-    const menu = mockMenus[currentChefSlug] || mockMenus.kodjo;
+  todayMeals.midi.forEach((m) => {
+    if (!dishCounts[m.dish]) dishCounts[m.dish] = { midi: 0, soir: 0 };
+    dishCounts[m.dish].midi += 1;
+  });
 
-    if (sub.planId === 'midi' || sub.planId === 'complet') {
-      const dish = menu.midi;
-      if (!dishCounts[dish]) dishCounts[dish] = { midi: 0, soir: 0 };
-      dishCounts[dish].midi += 1;
-    }
-
-    if (sub.planId === 'soir' || sub.planId === 'complet') {
-      const dish = menu.soir;
-      if (!dishCounts[dish]) dishCounts[dish] = { midi: 0, soir: 0 };
-      dishCounts[dish].soir += 1;
-    }
+  todayMeals.soir.forEach((m) => {
+    if (!dishCounts[m.dish]) dishCounts[m.dish] = { midi: 0, soir: 0 };
+    dishCounts[m.dish].soir += 1;
   });
 
   const result: DishQuantity[] = [];
@@ -61,6 +49,8 @@ export default function ChefAdminOrders() {
   const { user } = useAuth();
   const [stats, setStats] = useState({ midi: 0, soir: 0, total: 0 });
   const [productionList, setProductionList] = useState<DishQuantity[]>([]);
+  const [todayMeals, setTodayMeals] = useState<{ midi: ClientMeal[]; soir: ClientMeal[] }>({ midi: [], soir: [] });
+  const [expanded, setExpanded] = useState<'midi' | 'soir' | ''>('');
 
   const currentChefSlug = user?.chefSlug || 'kodjo';
 
@@ -68,26 +58,49 @@ export default function ChefAdminOrders() {
     if (!currentChefSlug) return;
 
     const allSubs = StorageService.getSubscriptions();
-    const mySubs = allSubs.filter((sub) => sub.chefSlug === currentChefSlug);
+    const mySubs = allSubs.filter((sub) => sub.chefSlug === currentChefSlug && sub.status === 'active');
 
-    let countMidi = 0;
-    let countSoir = 0;
-    mySubs.forEach((sub) => {
-      if (sub.planId === 'midi' || sub.planId === 'complet') countMidi++;
-      if (sub.planId === 'soir' || sub.planId === 'complet') countSoir++;
+    const menu = StorageService.getMenu(currentChefSlug);
+    const dayIndex = new Date().getDay(); // 0 dimanche
+    const dayNames = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+    const dayName = dayNames[dayIndex];
+    const todayMenu = menu[dayIndex === 0 ? 6 : dayIndex - 1] || menu[0];
+
+    const midiMeals: ClientMeal[] = [];
+    const soirMeals: ClientMeal[] = [];
+
+    mySubs.forEach((sub: Subscription) => {
+      if (sub.days?.map((d) => d.toLowerCase()).includes(dayName)) {
+        if (sub.planId === 'midi' || sub.planId === 'complet') {
+          midiMeals.push({ clientEmail: sub.clientEmail, dish: todayMenu?.midi || 'Plat midi' });
+        }
+        if (sub.planId === 'soir' || sub.planId === 'complet') {
+          soirMeals.push({ clientEmail: sub.clientEmail, dish: todayMenu?.soir || 'Plat soir' });
+        }
+      }
     });
 
     setStats({
-      midi: countMidi,
-      soir: countSoir,
-      total: countMidi + countSoir
+      midi: midiMeals.length,
+      soir: soirMeals.length,
+      total: midiMeals.length + soirMeals.length
     });
 
-    setProductionList(groupDishesByQuantity(mySubs, currentChefSlug));
+    setTodayMeals({ midi: midiMeals, soir: soirMeals });
+    setProductionList(groupDishesByQuantity({ midi: midiMeals, soir: soirMeals }));
   }, [currentChefSlug]);
 
   const midiDishes = useMemo(() => productionList.filter((item) => item.moment === 'midi'), [productionList]);
   const soirDishes = useMemo(() => productionList.filter((item) => item.moment === 'soir'), [productionList]);
+
+  const handlePrint = () => {
+    const summary = `Pass de cuisine - Midi: ${stats.midi} plats, Soir: ${stats.soir} plats`;
+    if (navigator.share) {
+      navigator.share({ title: 'Pass de cuisine Chef★', text: summary }).catch(() => window.print());
+    } else {
+      window.print();
+    }
+  };
 
   return (
     <AppShell>
@@ -123,18 +136,14 @@ export default function ChefAdminOrders() {
                 </div>
               </div>
 
-              <button
-                className="btn btn-secondary"
-                onClick={() => alert('Fonctionnalité Impression en cours de développement !')}
-                style={{ marginBottom: '24px' }}
-              >
+              <button className="btn btn-secondary" onClick={handlePrint} style={{ marginBottom: '24px' }}>
                 <Printer size={20} />
-                Imprimer le Pass de Cuisine
+                Imprimer / Partager le Pass de Cuisine
               </button>
 
               <Section title="Détail de la production">
                 {midiDishes.length > 0 && (
-                  <div className="card" style={{ marginBottom: '12px' }}>
+                  <div className="card" style={{ marginBottom: '12px', cursor: 'pointer' }} onClick={() => setExpanded(expanded === 'midi' ? '' : 'midi')}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', borderBottom: '1px solid #eee', paddingBottom: '8px' }}>
                       <Clock size={18} color="#92400E" />
                       <span style={{ fontWeight: '700', color: '#92400E' }}>MIDI ({stats.midi} TOTAL)</span>
@@ -160,11 +169,23 @@ export default function ChefAdminOrders() {
                         </span>
                       </div>
                     ))}
+                    {expanded === 'midi' && todayMeals.midi.length > 0 && (
+                      <div style={{ marginTop: '12px', borderTop: '1px solid #F3F4F6', paddingTop: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
+                          <Users size={16} /> Clients service midi
+                        </div>
+                        {todayMeals.midi.map((m, idx) => (
+                          <div key={`mclient-${idx}`} style={{ fontSize: '13px', color: '#111827', marginBottom: '4px' }}>
+                            {m.clientEmail} — {m.dish}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 
                 {soirDishes.length > 0 && (
-                  <div className="card">
+                  <div className="card" style={{ cursor: 'pointer' }} onClick={() => setExpanded(expanded === 'soir' ? '' : 'soir')}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', borderBottom: '1px solid #eee', paddingBottom: '8px' }}>
                       <Clock size={18} color="#1E40AF" />
                       <span style={{ fontWeight: '700', color: '#1E40AF' }}>SOIR ({stats.soir} TOTAL)</span>
@@ -190,6 +211,18 @@ export default function ChefAdminOrders() {
                         </span>
                       </div>
                     ))}
+                    {expanded === 'soir' && todayMeals.soir.length > 0 && (
+                      <div style={{ marginTop: '12px', borderTop: '1px solid #F3F4F6', paddingTop: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
+                          <Users size={16} /> Clients service soir
+                        </div>
+                        {todayMeals.soir.map((m, idx) => (
+                          <div key={`sclient-${idx}`} style={{ fontSize: '13px', color: '#111827', marginBottom: '4px' }}>
+                            {m.clientEmail} — {m.dish}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </Section>

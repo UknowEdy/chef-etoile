@@ -16,8 +16,29 @@ export default function ChefAdminSubscribers() {
   const currentChefSlug = user?.chefSlug || 'kodjo';
 
   useEffect(() => {
-    const allSubs = StorageService.getSubscriptions();
-    const mySubs = allSubs.filter(sub => sub.chefSlug === currentChefSlug);
+    const seedDemo = () => {
+      const existing = StorageService.getSubscriptions().filter((sub) => sub.chefSlug === currentChefSlug);
+      if (existing.length > 0) return existing;
+
+      const demoClients = [
+        { email: 'client1@test.com', planId: 'midi', planName: 'Formule Midi', price: '7 500 F' },
+        { email: 'client2@test.com', planId: 'soir', planName: 'Formule Soir', price: '7 500 F' }
+      ];
+
+      demoClients.forEach((c) =>
+        StorageService.addSubscription({
+          clientEmail: c.email,
+          chefSlug: currentChefSlug,
+          chefName: 'Chef Kodjo',
+          planId: c.planId,
+          planName: c.planName,
+          price: c.price
+        })
+      );
+      return StorageService.getSubscriptions().filter((sub) => sub.chefSlug === currentChefSlug);
+    };
+
+    const mySubs = seedDemo();
     setSubscribers(mySubs);
 
     const photoMap: Record<string, string> = {};
@@ -28,9 +49,21 @@ export default function ChefAdminSubscribers() {
     setClientPhotos(photoMap);
   }, [currentChefSlug]);
 
-  const filteredSubs = subscribers.filter(sub => 
-    sub.planName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredSubs = subscribers.filter((sub) => {
+    const term = searchTerm.toLowerCase();
+    const matchesText = sub.planName.toLowerCase().includes(term) || sub.clientEmail.toLowerCase().includes(term);
+    return (sub.status === 'active' || sub.status === 'pending') && matchesText;
+  });
+
+  const formatDate = (iso?: string, fallbackISO?: string) => {
+    if (iso) return new Date(iso).toLocaleDateString('fr-FR');
+    if (fallbackISO) {
+      const base = new Date(fallbackISO);
+      const plus7 = new Date(base.getTime() + 7 * 24 * 60 * 60 * 1000);
+      return plus7.toLocaleDateString('fr-FR');
+    }
+    return '—';
+  };
 
   return (
     <AppShell>
@@ -77,22 +110,49 @@ export default function ChefAdminSubscribers() {
                         <div style={{ fontSize: '12px', color: '#6B7280' }}>#{sub.id.slice(-4)}</div>
                       </div>
                     </div>
-                    <span className="badge badge-success">{sub.status}</span>
+                    <span className={`badge ${sub.status === 'pending' ? 'badge-warning' : 'badge-success'}`}>
+                      {sub.status}
+                    </span>
                   </div>
                   
                   <div style={{ fontSize: '13px', color: '#6B7280', marginBottom: '12px' }}>
                     <div>Formule : <span style={{ color: '#111827', fontWeight: '500' }}>{sub.planName}</span></div>
                     <div>Depuis le : {sub.startDate}</div>
+                    <div>Expire le : {formatDate(sub.expiryDateISO, sub.startDateISO)}</div>
                     <div>Montant : {sub.price}</div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #E5E7EB', paddingTop: '12px' }}>
-                    <button className="btn btn-secondary" style={{ flex: 1, padding: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #E5E7EB', paddingTop: '12px', flexWrap: 'wrap' }}>
+                    <button className="btn btn-secondary" style={{ flex: 1, minWidth: '140px', padding: '8px' }}>
                       <Phone size={16} /> Appeler
                     </button>
-                    <button className="btn btn-whatsapp" style={{ flex: 1, padding: '8px' }}>
+                    <button className="btn btn-whatsapp" style={{ flex: 1, minWidth: '140px', padding: '8px' }}>
                       <MessageCircle size={16} /> WhatsApp
                     </button>
+                    {sub.status === 'pending' && (
+                      <>
+                        <button
+                          className="btn btn-primary"
+                          style={{ flex: 1, minWidth: '140px', padding: '8px' }}
+                          onClick={() => {
+                            StorageService.validateSubscription(sub.id);
+                            setSubscribers(StorageService.getSubscriptions().filter((s) => s.chefSlug === currentChefSlug));
+                          }}
+                        >
+                          Valider l'abonnement
+                        </button>
+                        <button
+                          className="btn btn-secondary"
+                          style={{ flex: 1, minWidth: '140px', padding: '8px', background: '#FEE2E2', color: '#B91C1C', borderColor: '#FEE2E2' }}
+                          onClick={() => {
+                            StorageService.rejectSubscription(sub.id);
+                            setSubscribers(StorageService.getSubscriptions().filter((s) => s.chefSlug === currentChefSlug));
+                          }}
+                        >
+                          Rejeter
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}

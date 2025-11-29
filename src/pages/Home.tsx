@@ -1,12 +1,22 @@
+import { useMemo } from 'react';
 import AppShell from '../components/AppShell';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 import GuestHome from './GuestHome';
 import UserDashboard from './UserDashboard';
-import { MOCK_SUBSCRIPTIONS } from '../data/mocks';
+import { useAuth } from '../context/AuthContext';
+import { StorageService } from '../utils/storage';
 
 export default function Home() {
-  const isSubscribed = MOCK_SUBSCRIPTIONS.length > 0;
+  const { user } = useAuth();
+  const subs = useMemo(() => {
+    if (!user?.email) return [];
+    return StorageService.getSubscriptions().filter(
+      (sub) => sub.clientEmail === user.email && sub.status === 'active'
+    );
+  }, [user?.email]);
+
+  const isSubscribed = user?.email && subs.length > 0;
 
   return (
     <AppShell>

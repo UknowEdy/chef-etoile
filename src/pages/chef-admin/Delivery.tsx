@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MapPin, Phone, Clock, Check, Navigation, Map } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
 import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle } from '../../components';
+import { StorageService } from '../../utils/storage';
+import { useAuth } from '../../context/AuthContext';
 
 interface Delivery {
   id: string;
@@ -22,48 +24,51 @@ interface Delivery {
 
 export default function ChefAdminDelivery() {
   const navigate = useNavigate();
-  
-  const [deliveries, setDeliveries] = useState<Delivery[]>([
-    { 
-      id: '1', 
-      clientName: 'Jean Dupont', 
-      meal: 'Riz sauce arachide', 
-      moment: 'Midi',
-      address: 'Tokoin Cassablanca', 
-      gpsLat: 6.1719,
-      gpsLon: 1.2314,
-      phone: '+228 90 12 34 56',
-      time: '12:00',
-      status: 'pending',
-      distance: 2.3
-    },
-    { 
-      id: '2', 
-      clientName: 'Marie Kouassi', 
-      meal: 'Riz sauce arachide', 
-      moment: 'Midi',
-      address: 'Bè Kpota', 
-      gpsLat: 6.1456,
-      gpsLon: 1.2567,
-      phone: '+228 90 23 45 67',
-      time: '12:30',
-      status: 'pending',
-      distance: 4.1
-    },
-    { 
-      id: '3', 
-      clientName: 'Pierre Agbodjan', 
-      meal: 'Attiéké poisson', 
-      moment: 'Soir',
-      address: 'Hèdzranawoé', 
-      gpsLat: 6.1678,
-      gpsLon: 1.2789,
-      phone: '+228 90 34 56 78',
-      time: '19:00',
-      status: 'pending',
-      distance: 5.8
-    }
-  ]);
+  const { user } = useAuth();
+  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+
+  useEffect(() => {
+    const chefSlug = user?.chefSlug || 'kodjo';
+    const subs = StorageService.getSubscriptions().filter(
+      (s) => s.chefSlug === chefSlug && s.status === 'active'
+    );
+    const menu = StorageService.getMenu(chefSlug);
+    const dayIndex = new Date().getDay();
+    const dayNames = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+    const dayName = dayNames[dayIndex];
+    const todayMenu = menu[dayIndex === 0 ? 6 : dayIndex - 1] || menu[0];
+
+    const generated: Delivery[] = [];
+    subs.forEach((sub) => {
+      if (!sub.days?.map((d) => d.toLowerCase()).includes(dayName)) return;
+      const baseAddress = `Point de retrait ${sub.clientEmail.split('@')[0]}`;
+      const baseLat = 6.15 + Math.random() * 0.05;
+      const baseLon = 1.24 + Math.random() * 0.05;
+      const pushDelivery = (moment: 'Midi' | 'Soir', dish: string) => {
+        generated.push({
+          id: `${sub.id}-${moment}`,
+          clientName: sub.clientEmail,
+          meal: dish,
+          moment,
+          address: baseAddress,
+          gpsLat: baseLat,
+          gpsLon: baseLon,
+          phone: sub.clientPhone || '+22891209085',
+          time: moment === 'Midi' ? '12:00' : '19:00',
+          status: 'pending',
+          distance: parseFloat((2 + Math.random() * 4).toFixed(1))
+        });
+      };
+      if (sub.planId === 'midi' || sub.planId === 'complet') {
+        pushDelivery('Midi', todayMenu?.midi || 'Plat midi');
+      }
+      if (sub.planId === 'soir' || sub.planId === 'complet') {
+        pushDelivery('Soir', todayMenu?.soir || 'Plat soir');
+      }
+    });
+
+    setDeliveries(generated);
+  }, [user?.chefSlug]);
 
   const markAsDelivered = (id: string) => {
     setDeliveries(deliveries.map(d => 

@@ -5,24 +5,13 @@ import TopBar from '../../components/TopBar';
 import ChefBottomNav from '../../components/ChefBottomNav';
 import { PageTitle, Section } from '../../components';
 import { useAuth } from '../../context/AuthContext';
-import { StorageService } from '../../utils/storage';
+import { StorageService, ChefPlan } from '../../utils/storage';
 
 export default function ChefAdminSettings() {
   const { user } = useAuth();
   const chefSlug = user?.chefSlug || 'kodjo';
+  const [plans, setPlans] = useState<ChefPlan[]>([]);
   const [settings, setSettings] = useState({
-    prixMidi: '7500',
-    prixSoir: '7500',
-    prixComplet: '14000',
-    joursService: {
-      lundi: true,
-      mardi: true,
-      mercredi: true,
-      jeudi: true,
-      vendredi: true,
-      samedi: true,
-      dimanche: false
-    },
     rayonLivraison: '10',
     telephone: '+228 90 12 34 56',
     adresse: 'Tokoin, Lomé',
@@ -32,13 +21,15 @@ export default function ChefAdminSettings() {
 
   useEffect(() => {
     if (!chefSlug) return;
-    const stored = StorageService.getChefPhoto(chefSlug);
-    if (stored) setPhoto(stored);
+    const storedPhoto = StorageService.getChefPhoto(chefSlug);
+    if (storedPhoto) setPhoto(storedPhoto);
+    setPlans(StorageService.getChefPlans(chefSlug));
   }, [chefSlug]);
 
   const handleSave = () => {
-    if (chefSlug && photo) {
-      StorageService.saveChefPhoto(chefSlug, photo);
+    if (chefSlug) {
+      if (photo) StorageService.saveChefPhoto(chefSlug, photo);
+      StorageService.saveChefPlans(chefSlug, plans);
     }
     alert('Paramètres sauvegardés !');
   };
@@ -60,7 +51,32 @@ export default function ChefAdminSettings() {
     reader.readAsDataURL(file);
   };
 
-  const joursTotal = Object.values(settings.joursService).filter(Boolean).length;
+  const joursTotal = plans.reduce((sum, p) => sum + p.days.length, 0);
+  const togglePlanActive = (planId: ChefPlan['id'], active: boolean) => {
+    setPlans((prev) => prev.map((p) => (p.id === planId ? { ...p, active } : p)));
+  };
+
+  const updatePlanPrice = (planId: ChefPlan['id'], price: string) => {
+    setPlans((prev) => prev.map((p) => (p.id === planId ? { ...p, price } : p)));
+  };
+
+  const toggleDay = (planId: ChefPlan['id'], day: string, checked: boolean) => {
+    setPlans((prev) =>
+      prev.map((p) =>
+        p.id === planId
+          ? {
+              ...p,
+              days: checked ? Array.from(new Set([...p.days, day])) : p.days.filter((d) => d !== day)
+            }
+          : p
+      )
+    );
+  };
+
+  const selectAllDays = (planId: ChefPlan['id']) => {
+    const allDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+    setPlans((prev) => prev.map((p) => (p.id === planId ? { ...p, days: allDays } : p)));
+  };
 
   return (
     <AppShell>
@@ -98,87 +114,66 @@ export default function ChefAdminSettings() {
             </div>
           </Section>
 
-          <Section title="Tarifs d'abonnement">
-            <div className="card">
-              <label className="label">Formule Midi (par semaine)</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <input 
-                  type="number"
-                  className="input"
-                  value={settings.prixMidi}
-                  onChange={(e) => setSettings({ ...settings, prixMidi: e.target.value })}
-                  style={{ flex: 1 }}
-                />
-                <span style={{ fontSize: '14px', color: '#6B7280' }}>F CFA</span>
-              </div>
+          <Section title="Formules & jours">
+            <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {plans.map((plan) => (
+                <div key={plan.id} style={{ borderBottom: '1px solid #E5E7EB', paddingBottom: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '15px', fontWeight: 700 }}>{plan.name}</div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#6B7280' }}>
+                      <input
+                        type="checkbox"
+                        checked={plan.active}
+                        onChange={(e) => togglePlanActive(plan.id, e.target.checked)}
+                        style={{ width: '18px', height: '18px', accentColor: '#D4AF37' }}
+                      />
+                      Activer
+                    </label>
+                  </div>
 
-              <label className="label">Formule Soir (par semaine)</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <input 
-                  type="number"
-                  className="input"
-                  value={settings.prixSoir}
-                  onChange={(e) => setSettings({ ...settings, prixSoir: e.target.value })}
-                  style={{ flex: 1 }}
-                />
-                <span style={{ fontSize: '14px', color: '#6B7280' }}>F CFA</span>
-              </div>
+                  <label className="label">Prix (par semaine)</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                    <input
+                      type="number"
+                      className="input"
+                      value={plan.price}
+                      onChange={(e) => updatePlanPrice(plan.id, e.target.value)}
+                      style={{ flex: 1, opacity: plan.active ? 1 : 0.5 }}
+                      disabled={!plan.active}
+                    />
+                    <span style={{ fontSize: '14px', color: '#6B7280' }}>F CFA</span>
+                  </div>
 
-              <label className="label">Formule Complète (par semaine)</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <input 
-                  type="number"
-                  className="input"
-                  value={settings.prixComplet}
-                  onChange={(e) => setSettings({ ...settings, prixComplet: e.target.value })}
-                  style={{ flex: 1 }}
-                />
-                <span style={{ fontSize: '14px', color: '#6B7280' }}>F CFA</span>
-              </div>
-            </div>
-          </Section>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <div style={{ fontSize: '13px', color: '#6B7280' }}>Jours proposés</div>
+                    <button
+                      className="btn btn-secondary"
+                      style={{ padding: '6px 10px', fontSize: '12px', opacity: plan.active ? 1 : 0.5 }}
+                      onClick={() => selectAllDays(plan.id)}
+                      disabled={!plan.active}
+                    >
+                      Tous les jours
+                    </button>
+                  </div>
 
-          <Section title={`Jours de service (${joursTotal}/7)`}>
-            <div className="card">
-              {Object.entries(settings.joursService).map(([jour, actif]) => (
-                <label 
-                  key={jour}
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    padding: '12px 0',
-                    borderBottom: '1px solid #E5E7EB',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <input 
-                    type="checkbox"
-                    checked={actif}
-                    onChange={(e) => handleJourChange(jour, e.target.checked)}
-                    style={{ 
-                      width: '20px', 
-                      height: '20px', 
-                      marginRight: '12px',
-                      cursor: 'pointer',
-                      accentColor: '#D4AF37'
-                    }}
-                  />
-                  <span style={{ 
-                    fontSize: '15px', 
-                    fontWeight: 500,
-                    textTransform: 'capitalize'
-                  }}>
-                    {jour}
-                  </span>
-                </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', opacity: plan.active ? 1 : 0.5, pointerEvents: plan.active ? 'auto' : 'none' }}>
+                    {['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'].map((day) => (
+                      <label key={day} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', textTransform: 'capitalize' }}>
+                        <input
+                          type="checkbox"
+                          checked={plan.days.includes(day)}
+                          onChange={(e) => toggleDay(plan.id, day, e.target.checked)}
+                          style={{ width: '16px', height: '16px', accentColor: '#D4AF37' }}
+                        />
+                        {day}
+                      </label>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
-            <div style={{ 
-              marginTop: '8px', 
-              fontSize: '13px', 
-              color: '#6B7280' 
-            }}>
-              💡 Les clients verront ces jours dans vos formules
+            <div style={{ marginTop: '8px', fontSize: '13px', color: '#6B7280' }}>
+              💡 Activez les formules et cochez les jours disponibles. Le client les verra sur votre profil.
             </div>
           </Section>
 

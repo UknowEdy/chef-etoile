@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, X, MapPin, Phone, Mail, DollarSign } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import TopBar from '../../components/TopBar';
 import { PageTitle } from '../../components';
 import SuperAdminBottomNav from '../../components/SuperAdminBottomNav';
+import { StorageService } from '../../utils/storage';
 
-interface Chef {
+interface ChefCardData {
   id: string;
   name: string;
   slug: string;
@@ -14,65 +15,39 @@ interface Chef {
   subscribers: number;
   status: 'active' | 'inactive';
   phone: string;
-  email: string;
+  email?: string;
   address: string;
-  joinDate: string;
-  revenue: string;
-  mealsServed: number;
   rating: number;
+  mealsServed?: number;
+  revenue?: string;
 }
 
 export default function SuperAdminChefs() {
   const navigate = useNavigate();
-  const [selectedChef, setSelectedChef] = useState<Chef | null>(null);
+  const [selectedChef, setSelectedChef] = useState<ChefCardData | null>(null);
 
-  const chefs: Chef[] = [
-    { 
-      id: '1', 
-      name: 'Chef Kodjo', 
-      slug: 'kodjo',
-      quartier: 'Tokoin', 
-      subscribers: 24, 
-      status: 'active',
-      phone: '+228 90 12 34 56',
-      email: 'kodjo@chefetoile.com',
-      address: 'Rue 123, Tokoin, Lomé',
-      joinDate: '2024-01-15',
-      revenue: '850 000',
-      mealsServed: 312,
-      rating: 4.6
-    },
-    { 
-      id: '2', 
-      name: 'Chef Anna', 
-      slug: 'anna',
-      quartier: 'Bè', 
-      subscribers: 18, 
-      status: 'active',
-      phone: '+228 90 23 45 67',
-      email: 'anna@chefetoile.com',
-      address: 'Rue 456, Bè, Lomé',
-      joinDate: '2024-02-20',
-      revenue: '620 000',
-      mealsServed: 245,
-      rating: 4.8
-    },
-    { 
-      id: '3', 
-      name: 'Chef Gloria', 
-      slug: 'gloria',
-      quartier: 'Hèdzranawoé', 
-      subscribers: 31, 
-      status: 'active',
-      phone: '+228 90 34 56 78',
-      email: 'gloria@chefetoile.com',
-      address: 'Rue 789, Hèdzranawoé, Lomé',
-      joinDate: '2023-11-10',
-      revenue: '1 120 000',
-      mealsServed: 428,
-      rating: 4.7
-    }
-  ];
+  const chefs = useMemo<ChefCardData[]>(() => {
+    const profiles = StorageService.getAllChefs();
+    const subs = StorageService.getSubscriptions();
+    return profiles.map((chef, index) => {
+      const activeSubs = subs.filter((s) => s.chefSlug === chef.slug && s.status === 'active').length;
+      const quartier = chef.location.split(',')[0] || chef.location;
+      return {
+        id: String(index + 1),
+        name: chef.name,
+        slug: chef.slug,
+        quartier,
+        subscribers: activeSubs,
+        status: chef.isSuspended ? 'inactive' : 'active',
+        phone: chef.phone || '',
+        email: `${chef.slug}@chefetoile.com`,
+        address: chef.location,
+        rating: chef.rating,
+        mealsServed: activeSubs * 10, // approximation
+        revenue: `${activeSubs * 7500}` // approximation
+      };
+    });
+  }, []);
 
   return (
     <AppShell>
@@ -81,7 +56,7 @@ export default function SuperAdminChefs() {
         <div className="page-content">
           <PageTitle 
             title="Gérer les Chefs★" 
-            subtitle={`${chefs.length} Chefs★ actifs`}
+            subtitle={`${chefs.filter((c) => c.status === 'active').length} Chefs★ actifs`}
           />
 
           <button 
@@ -106,7 +81,15 @@ export default function SuperAdminChefs() {
                   <div style={{ fontSize: '16px', fontWeight: '600' }}>
                     {chef.name}
                   </div>
-                  <span className="badge badge-success">
+                  <span
+                    className="badge"
+                    style={{
+                      backgroundColor: chef.status === 'active' ? '#D1FAE5' : '#FEE2E2',
+                      color: chef.status === 'active' ? '#065F46' : '#B91C1C',
+                      border: `1px solid ${chef.status === 'active' ? '#34D399' : '#FCA5A5'}`,
+                      fontWeight: 700
+                    }}
+                  >
                     {chef.status === 'active' ? 'Actif' : 'Inactif'}
                   </span>
                 </div>
@@ -182,7 +165,7 @@ export default function SuperAdminChefs() {
                   </div>
                   <div style={{ textAlign: 'center', padding: '12px', background: '#F3F4F6', borderRadius: '8px' }}>
                     <div style={{ fontSize: '20px', fontWeight: '700', color: '#111827' }}>
-                      {selectedChef.mealsServed}
+                      {selectedChef.mealsServed ?? 0}
                     </div>
                     <div style={{ fontSize: '11px', color: '#6B7280' }}>Repas</div>
                   </div>

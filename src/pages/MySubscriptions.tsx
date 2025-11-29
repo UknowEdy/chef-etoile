@@ -14,10 +14,20 @@ export default function MySubscriptions() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const clientEmail = user?.email;
 
+  const formatDate = (iso?: string, fallbackISO?: string) => {
+    if (iso) return new Date(iso).toLocaleDateString('fr-FR');
+    if (fallbackISO) {
+      const base = new Date(fallbackISO);
+      const plus7 = new Date(base.getTime() + 7 * 24 * 60 * 60 * 1000);
+      return plus7.toLocaleDateString('fr-FR');
+    }
+    return '—';
+  };
+
   useEffect(() => {
     if (!clientEmail) return;
     const allSubs = StorageService.getSubscriptions();
-    const mySubs = allSubs.filter((sub) => sub.clientEmail === clientEmail);
+    const mySubs = allSubs.filter((sub) => sub.clientEmail === clientEmail && sub.status === 'active');
     setSubscriptions(mySubs);
   }, [clientEmail]);
 
@@ -71,6 +81,10 @@ export default function MySubscriptions() {
                     <div>
                       <span style={{ color: '#6B7280' }}>Début:</span>
                       <span style={{ fontWeight: 600, marginLeft: '8px' }}>{sub.startDate}</span>
+                    </div>
+                    <div>
+                      <span style={{ color: '#6B7280' }}>Expire:</span>
+                      <span style={{ fontWeight: 600, marginLeft: '8px' }}>{formatDate(sub.expiryDateISO, sub.startDateISO)}</span>
                     </div>
                   </div>
                   
